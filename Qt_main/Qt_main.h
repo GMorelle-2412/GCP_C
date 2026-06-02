@@ -8,6 +8,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
+#include <QCheckBox>
 
 class Qt_main : public QMainWindow{
 
@@ -32,4 +33,16 @@ private slots:
     void bouton_inscription();
 
     void affiche_info_user();
+
+    void bouton_deconection();
+
+    void bouton_annulation();
+
+    void bouton_creation_projet();
+
+    void ajouter_liste();
+
+    void creation_projet();
+
+    void affiche_element_liste();
 };
