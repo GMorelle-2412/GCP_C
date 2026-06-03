@@ -1,4 +1,4 @@
-#include "Qt_main.h"
+ï»¿#include "Qt_main.h"
 
 Qt_main::Qt_main(QWidget* parent)
     : QMainWindow(parent)
@@ -6,10 +6,10 @@ Qt_main::Qt_main(QWidget* parent)
 {
     ui->setupUi(this);
 
-    /*Connection à la BDD*/
+    /*Connection Ã  la BDD*/
     class_BDD.Connect_BDD();
 
-    /*Page de démarage*/
+    /*Page de dÃ©marage*/
     ui->stackedWidget->setCurrentIndex(0);
 
     /*Appel de fonction*/
@@ -26,7 +26,7 @@ Qt_main::Qt_main(QWidget* parent)
     bouton_deconection();
     bouton_creation_projet();
 
-    //création de projet
+    //crÃ©ation de projet
     ajouter_liste();
     creation_projet();
 }
@@ -119,13 +119,28 @@ void Qt_main::bouton_annulation() {
         ui->stackedWidget->setCurrentIndex(0);
     });
 
-    //Création élément 
+    //CrÃ©ation Ã©lÃ©ment 
     connect(ui->pushButton_9, &QPushButton::clicked, this, [this]() {
         ui->stackedWidget->setCurrentIndex(3);
 
         // Vider le layout
         while (ui->verticalLayout_8->count() > 0) {
             QLayoutItem* item = ui->verticalLayout_8->takeAt(0);
+
+            if (item->widget())
+                item->widget()->deleteLater();
+
+            delete item;
+        }
+        });
+
+    //Modif element
+    connect(ui->pushButton_14, &QPushButton::clicked, this, [this]() {
+        ui->stackedWidget->setCurrentIndex(3);
+        
+        // Vider le layout
+        while (ui->verticalLayout_12->count() > 0) {
+            QLayoutItem* item = ui->verticalLayout_12->takeAt(0);
 
             if (item->widget())
                 item->widget()->deleteLater();
@@ -170,11 +185,11 @@ void Qt_main::ajouter_liste(){
 void Qt_main::creation_projet(){
     connect(ui->pushButton_10, &QPushButton::clicked, this, [this]() {
 
-        // 1) Enregistrer l’élément principal
+        // 1) Enregistrer lâ€™Ã©lÃ©ment principal
         QString nom = ui->lineEdit_5->text();
         QString description = ui->lineEdit_6->text();
 
-        class_BDD.Poste_element(nom, description);   // met à jour id_element
+        class_BDD.Poste_element(nom, description);   // met Ã  jour id_element
 
         class_BDD.id_liste.clear(); // IMPORTANT : vider avant de remplir
 
@@ -192,19 +207,19 @@ void Qt_main::creation_projet(){
             QString contenu = edit->text();
             QString validation = check->isChecked() ? "1" : "0";
 
-            // Récupérer l’ID de la ligne insérée
+            // RÃ©cupÃ©rer lâ€™ID de la ligne insÃ©rÃ©e
             int id = class_BDD.Poste_liste(contenu, validation);
 
-            // Stocker l’ID
+            // Stocker lâ€™ID
             class_BDD.id_liste.push_back(id);
         }
 
-        // 3) Créer les relations dans contenu_liste
+        // 3) CrÃ©er les relations dans contenu_liste
         for (int id_l : class_BDD.id_liste) {
             class_BDD.Poste_contenu_liste(class_BDD.id_element, id_l);
         }
 
-        // 4) Nettoyer l’interface
+        // 4) Nettoyer lâ€™interface
         while (ui->verticalLayout_8->count() > 0) {
             QLayoutItem* item = ui->verticalLayout_8->takeAt(0);
             if (item->widget()) item->widget()->deleteLater();
@@ -217,26 +232,146 @@ void Qt_main::creation_projet(){
 
 void Qt_main::affiche_element_liste() {
 
-    std::vector<BDD::LigneListe> liste = class_BDD.Get_liste();
+    std::vector<BDD::LigneListe> data_liste = class_BDD.Get_liste();
+    std::vector<BDD::LigneContenueElement> data_contenue_liste = class_BDD.Get_contenu_liste();
+    std::vector<BDD::LigneElement> data_element = class_BDD.Get_element();
 
-    for (int i = 0; i < liste.size(); i++) {
+    int verification_element = 0;
+
+    for (int i = 0; i < data_liste.size(); i++) {
+
+        QWidget* projet = new QWidget(this);
+        QVBoxLayout* zone_projet = new QVBoxLayout(projet);
+        zone_projet->setContentsMargins(0, 0, 0, 0);
+
+
+        for (int j = 0; j < data_contenue_liste.size(); j++) {
+
+            if (data_liste[i].id == data_contenue_liste[j].id_liste) {
+
+                for (int k = 0; k < data_element.size(); k++) {
+
+                    if (data_contenue_liste[j].id_element == data_element[k].id) {
+
+                        if (verification_element != data_contenue_liste[j].id_element) {
+
+                            QLabel* nom = new QLabel(data_element[k].nom, projet);
+                            zone_projet->addWidget(nom);
+
+                            QLabel* description = new QLabel(data_element[k].description, projet);
+                            zone_projet->addWidget(description);
+
+                            verification_element = data_contenue_liste[j].id_element;
+
+                            QPushButton* modif = new QPushButton("Modification", projet);
+                            zone_projet->addWidget(modif);
+
+                            modif_projet();
+
+                            // Appel correct
+                            affichage_modif_projet(data_element[k].id, data_element, data_liste, data_contenue_liste, modif);
+
+                        }
+                    }
+                }
+            }
+        }
+
+        // Ligne contenant checkbox + nom de la liste
+        QWidget* ligne = new QWidget(projet);
+        QHBoxLayout* layout = new QHBoxLayout(ligne);
+        layout->setContentsMargins(0, 0, 0, 0);
+
+        QCheckBox* validation = new QCheckBox(ligne);
+        validation->setChecked(data_liste[i].validation == "1");
+        layout->addWidget(validation);
+
+        QLabel* contenu = new QLabel(data_liste[i].contenu, ligne);
+        layout->addWidget(contenu);
+
+        QPushButton* supp = new QPushButton("Suppression", ligne);
+        layout->addWidget(supp);
+
+        // On ajoute la ligne dans le projet
+        zone_projet->addWidget(ligne);
+
+        // On ajoute le projet dans le layout principal
+        ui->verticalLayout_9->addWidget(projet);
+    }
+
+
+
+
+    /*for (int i = 0; i < data_liste.size(); i++) {
 
         QWidget* ligne = new QWidget(this);
         QHBoxLayout* layout = new QHBoxLayout(ligne);
         layout->setContentsMargins(0, 0, 0, 0);
 
         QCheckBox* validation = new QCheckBox(ligne);
-        validation->setChecked(liste[i].validation == "1");
+        validation->setChecked(data_liste[i].validation == "1");
         layout->addWidget(validation);
 
-        QLabel* contenu = new QLabel(liste[i].contenu, ligne);
+        QLabel* contenu = new QLabel(data_liste[i].contenu, ligne);
         layout->addWidget(contenu);
 
         ui->verticalLayout_9->addWidget(ligne);
-    }
+    }*/
+
+    
 
 }
 
+void Qt_main::affichage_modif_projet(int id_element, std::vector<BDD::LigneElement> data_element, std::vector<BDD::LigneListe> data_liste, const std::vector<BDD::LigneContenueElement> data_contenue_liste, QPushButton* modif){
+
+    connect(modif, &QPushButton::clicked, this, [this, id_element, data_element, data_liste, data_contenue_liste]() {
+
+            ui->stackedWidget->setCurrentIndex(5);
+
+            std::vector<BDD::LigneListe> data_liste = class_BDD.Get_liste();
+
+            for (int i = 0; i < data_element.size(); i++) {
+                if (id_element == data_element[i].id) {
+                    ui->lineEdit_7->setText(data_element[i].nom);
+                    ui->lineEdit_8->setText(data_element[i].description);
+                }
+            }
+
+            for (int n = 0; n < data_liste.size(); n++) {
+
+                if (data_contenue_liste[n].id_element == id_element) {
+                    if (data_contenue_liste[n].id_liste == data_liste[n].id) {
+
+                        QWidget* projet = new QWidget(this);
+                        QVBoxLayout* zone_projet = new QVBoxLayout(projet);
+                        zone_projet->setContentsMargins(0, 0, 0, 0);
+
+                        QWidget* ligne = new QWidget(projet);
+                        QHBoxLayout* layout = new QHBoxLayout(ligne);
+                        layout->setContentsMargins(0, 0, 0, 0);
+
+                        QCheckBox* validation = new QCheckBox(ligne);
+                        validation->setChecked(data_liste[n].validation == "1");
+                        layout->addWidget(validation);
+
+                        QLabel* contenu = new QLabel(data_liste[n].contenu, ligne);
+                        layout->addWidget(contenu);
+
+                        QPushButton* supp = new QPushButton("Suppression", ligne);
+                        layout->addWidget(supp);
+
+                        zone_projet->addWidget(ligne);
+                        ui->verticalLayout_12->addWidget(projet);
+                    }
+                }
+            }
+            
+        });
+}
+
+void Qt_main::modif_projet() {
+
+}
 
 Qt_main::~Qt_main()
 {

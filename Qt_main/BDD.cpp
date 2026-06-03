@@ -93,37 +93,8 @@ void BDD::Suppression_User(){
     id_user = 0;
 }*/
 
-std::vector<BDD::LigneListe> BDD::Get_liste(){
 
-    std::vector<LigneListe> resultat;
-
-    QSqlQuery query;
-    query.prepare("SELECT * FROM liste WHERE id_user = :id_user");
-    query.bindValue(":id_user", id_user);
-
-    if (!query.exec()) {
-        qDebug() << "Erreur SQL:" << query.lastError().text();
-        return resultat; // retourne un tableau vide
-    }
-
-    while (query.next()) {
-
-        LigneListe ligne;
-        ligne.id = query.value("id").toInt();
-        ligne.contenu = query.value("contenu").toString();
-        ligne.validation = query.value("validation").toString();
-
-        resultat.push_back(ligne);
-
-        qDebug() << "ID:" << ligne.id
-            << "Contenu:" << ligne.contenu
-            << "Validation:" << ligne.validation;
-    }
-
-    return resultat;
-}
-
-
+/*Liste*/
 int BDD::Poste_liste(const QString& contenu, const QString& validation)
 {
     QSqlQuery query;
@@ -143,6 +114,37 @@ int BDD::Poste_liste(const QString& contenu, const QString& validation)
     return query.lastInsertId().toInt();
 }
 
+std::vector<BDD::LigneListe> BDD::Get_liste() {
+
+    std::vector<LigneListe> resultat;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM liste WHERE id_user = :id_user");
+    query.bindValue(":id_user", id_user);
+
+    if (!query.exec()) {
+        qDebug() << "Erreur SQL:" << query.lastError().text();
+        return resultat;
+    }
+
+    while (query.next()) {
+
+        LigneListe ligne;
+        ligne.id = query.value("id").toInt();
+        ligne.contenu = query.value("contenu").toString();
+        ligne.validation = query.value("validation").toString();
+
+        resultat.push_back(ligne);
+
+        qDebug() << "ID:" << ligne.id
+            << "Contenu:" << ligne.contenu
+            << "Validation:" << ligne.validation;
+    }
+
+    return resultat;
+}
+
+/*Contenu_liste*/
 void BDD::Poste_contenu_liste(int id_element, int id_liste) {
 
     QSqlQuery query;
@@ -157,6 +159,39 @@ void BDD::Poste_contenu_liste(int id_element, int id_liste) {
     }
 }
 
+std::vector<BDD::LigneContenueElement>BDD::Get_contenu_liste() {
+
+    std::vector<BDD::LigneContenueElement> data_contenu_liste;
+
+    std::vector<BDD::LigneListe> liste = Get_liste();
+
+    for (int i = 0; i < liste.size(); i++) {
+
+        QSqlQuery query;
+        query.prepare("SELECT * FROM contenu_liste WHERE id_liste = :id_liste");
+        query.bindValue(":id_liste", liste[i].id);
+
+        if (!query.exec()) {
+            qDebug() << "Erreur SQL Get_contenu_liste :" << query.lastError();
+            continue;
+        }
+
+        while (query.next()) {
+            LigneContenueElement Ligne;
+
+            Ligne.id = query.value("id").toInt();
+            Ligne.id_element = query.value("id_element").toInt();
+            Ligne.id_liste = query.value("id_liste").toInt();
+
+            qDebug() << Ligne.id_element;
+
+            data_contenu_liste.push_back(Ligne);
+        }
+    }
+    return data_contenu_liste;
+}
+
+/*Element*/
 void BDD::Poste_element(const QString& nom, const QString& description) {
 
     QSqlQuery query;
@@ -171,4 +206,54 @@ void BDD::Poste_element(const QString& nom, const QString& description) {
     }
 
     id_element = query.lastInsertId().toInt();
+}
+
+std::vector<BDD::LigneElement> BDD::Get_element()
+{
+    // Récupère tous les id_element depuis contenu_liste
+    std::vector<BDD::LigneContenueElement> data_liste = Get_contenu_liste();
+
+    std::vector<BDD::LigneElement> data_element;
+
+    for (int j = 0; j < data_liste.size(); j++) {
+
+        QSqlQuery query;
+        query.prepare("SELECT id, nom, description FROM element WHERE id = :id_element");
+        query.bindValue(":id_element", data_liste[j].id_element);
+
+        if (!query.exec()) {
+            qDebug() << "Erreur SQL Get_element :" << query.lastError();
+            continue;
+        }
+
+        while (query.next()) {
+
+            LigneElement elem;
+
+            elem.id = query.value("id").toInt();
+            elem.nom = query.value("nom").toString();
+            elem.description = query.value("description").toString();
+
+            qDebug() << elem.id;
+            qDebug() << elem.nom;
+            qDebug() << elem.description;
+
+            data_element.push_back(elem);
+        }
+    }
+
+    return data_element;
+}
+
+void modif_element(int id) {
+    QSqlQuery query;
+    query.prepare("UPDATE element SET nom = :nom, description = :description WHERE id = :id");
+    query.bindValue(":id", id);
+    //query.bindValue(":nom", nom);
+    //query.bindValue(":description", description);
+
+    if (!query.exec()) {
+        qDebug() << "Erreur SQL Update_liste :" << query.lastError();
+        return;
+    }
 }

@@ -45,4 +45,8 @@ private slots:
     void creation_projet();
 
     void affiche_element_liste();
+
+    void affichage_modif_projet(int id_element, std::vector<BDD::LigneElement> data_element, std::vector<BDD::LigneListe> data_liste, const std::vector<BDD::LigneContenueElement> data_contenue_liste, QPushButton* modif);
+
+    void modif_projet();
 };

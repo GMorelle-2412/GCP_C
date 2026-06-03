@@ -20,11 +20,25 @@ public:
 
     std::vector<int> id_liste;
 
-    //liste
+    //Capture liste
     struct LigneListe {
         int id;
         QString contenu;
         QString validation;
+    };
+
+    //Capture contenu_liste
+    struct LigneContenueElement {
+        int id;
+        int id_element;
+        int id_liste;
+    };
+
+    //Capture element
+    struct LigneElement {
+        int id;
+        QString nom;
+        QString description;
     };
 
 
@@ -41,9 +55,11 @@ public slots:
     void Suppression_User();
 
     /*element*/
-    void Get_element();
+    std::vector<LigneElement>Get_element();
 
     void Poste_element(const QString& nom, const QString& description);
+
+    void modif_element(int id);
 
     /*liste*/
     std::vector<LigneListe>Get_liste();
@@ -51,7 +67,7 @@ public slots:
     int Poste_liste(const QString& contenu, const QString& validation);
 
     /*contenu_liste*/
-    void Get_contenu_liste();
+    std::vector<LigneContenueElement>Get_contenu_liste();
 
     void Poste_contenu_liste(int id_element, int id_liste);
 
