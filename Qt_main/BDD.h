@@ -24,7 +24,7 @@ public:
     struct LigneListe {
         int id;
         QString contenu;
-        QString validation;
+        bool validation;
     };
 
     //Capture contenu_liste
@@ -50,21 +50,25 @@ public slots:
 
     void Inscription(const QString& nom, const QString& mdp);
 
-    void Modification_User(int id, const QString& nom, const QString& mdp);
+    //void Modification_User(int id, const QString& nom, const QString& mdp);
 
-    void Suppression_User();
+    //void Suppression_User();
 
     /*element*/
     std::vector<LigneElement>Get_element();
 
     void Poste_element(const QString& nom, const QString& description);
 
-    void modif_element(int id);
+    void modif_element(int id, QString nom, QString description);
 
     /*liste*/
     std::vector<LigneListe>Get_liste();
 
-    int Poste_liste(const QString& contenu, const QString& validation);
+    int Poste_liste(const QString& contenu, bool validation);
+
+    void modif_liste(int id, QString contenu, bool validation);
+
+    void delete_liste(int id_liste);
 
     /*contenu_liste*/
     std::vector<LigneContenueElement>Get_contenu_liste();

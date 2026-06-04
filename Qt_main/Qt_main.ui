@@ -413,8 +413,8 @@ QPushButton:hover {
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>496</width>
-               <height>256</height>
+               <width>98</width>
+               <height>28</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_10">
@@ -506,7 +506,7 @@ QPushButton:hover {
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>166</width>
+                   <width>98</width>
                    <height>148</height>
                   </rect>
                  </property>

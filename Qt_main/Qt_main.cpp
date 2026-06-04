@@ -29,6 +29,7 @@ Qt_main::Qt_main(QWidget* parent)
     //création de projet
     ajouter_liste();
     creation_projet();
+
 }
 
 
@@ -205,7 +206,7 @@ void Qt_main::creation_projet(){
             if (!edit || !check) continue;
 
             QString contenu = edit->text();
-            QString validation = check->isChecked() ? "1" : "0";
+            bool validation = check->isChecked();
 
             // Récupérer l’ID de la ligne insérée
             int id = class_BDD.Poste_liste(contenu, validation);
@@ -266,8 +267,6 @@ void Qt_main::affiche_element_liste() {
                             QPushButton* modif = new QPushButton("Modification", projet);
                             zone_projet->addWidget(modif);
 
-                            modif_projet();
-
                             // Appel correct
                             affichage_modif_projet(data_element[k].id, data_element, data_liste, data_contenue_liste, modif);
 
@@ -283,7 +282,7 @@ void Qt_main::affiche_element_liste() {
         layout->setContentsMargins(0, 0, 0, 0);
 
         QCheckBox* validation = new QCheckBox(ligne);
-        validation->setChecked(data_liste[i].validation == "1");
+        validation->setChecked(data_liste[i].validation);
         layout->addWidget(validation);
 
         QLabel* contenu = new QLabel(data_liste[i].contenu, ligne);
@@ -298,28 +297,6 @@ void Qt_main::affiche_element_liste() {
         // On ajoute le projet dans le layout principal
         ui->verticalLayout_9->addWidget(projet);
     }
-
-
-
-
-    /*for (int i = 0; i < data_liste.size(); i++) {
-
-        QWidget* ligne = new QWidget(this);
-        QHBoxLayout* layout = new QHBoxLayout(ligne);
-        layout->setContentsMargins(0, 0, 0, 0);
-
-        QCheckBox* validation = new QCheckBox(ligne);
-        validation->setChecked(data_liste[i].validation == "1");
-        layout->addWidget(validation);
-
-        QLabel* contenu = new QLabel(data_liste[i].contenu, ligne);
-        layout->addWidget(contenu);
-
-        ui->verticalLayout_9->addWidget(ligne);
-    }*/
-
-    
-
 }
 
 void Qt_main::affichage_modif_projet(int id_element, std::vector<BDD::LigneElement> data_element, std::vector<BDD::LigneListe> data_liste, const std::vector<BDD::LigneContenueElement> data_contenue_liste, QPushButton* modif){
@@ -330,48 +307,281 @@ void Qt_main::affichage_modif_projet(int id_element, std::vector<BDD::LigneEleme
 
             std::vector<BDD::LigneListe> data_liste = class_BDD.Get_liste();
 
-            for (int i = 0; i < data_element.size(); i++) {
-                if (id_element == data_element[i].id) {
-                    ui->lineEdit_7->setText(data_element[i].nom);
-                    ui->lineEdit_8->setText(data_element[i].description);
-                }
-            }
+            //vector_ligne_contenu.clear();
+
+            int sauve_num = 0;
 
             for (int n = 0; n < data_liste.size(); n++) {
 
-                if (data_contenue_liste[n].id_element == id_element) {
-                    if (data_contenue_liste[n].id_liste == data_liste[n].id) {
+                if (data_contenue_liste[n].id_element == id_element &&
+                    data_contenue_liste[n].id_liste == data_liste[n].id) {
 
-                        QWidget* projet = new QWidget(this);
-                        QVBoxLayout* zone_projet = new QVBoxLayout(projet);
-                        zone_projet->setContentsMargins(0, 0, 0, 0);
+                    //ligne_contenu ligne;
 
-                        QWidget* ligne = new QWidget(projet);
-                        QHBoxLayout* layout = new QHBoxLayout(ligne);
-                        layout->setContentsMargins(0, 0, 0, 0);
+                    int id_liste = data_contenue_liste[n].id_liste;
 
-                        QCheckBox* validation = new QCheckBox(ligne);
-                        validation->setChecked(data_liste[n].validation == "1");
-                        layout->addWidget(validation);
+                    QWidget* projet = new QWidget(this);
+                    QVBoxLayout* zone_projet = new QVBoxLayout(projet);
 
-                        QLabel* contenu = new QLabel(data_liste[n].contenu, ligne);
-                        layout->addWidget(contenu);
+                    QWidget* ligneWidget = new QWidget(projet);
+                    QHBoxLayout* layout = new QHBoxLayout(ligneWidget);
 
-                        QPushButton* supp = new QPushButton("Suppression", ligne);
-                        layout->addWidget(supp);
+                    QCheckBox* validation = new QCheckBox(ligneWidget);
+                    validation->setChecked(data_liste[n].validation);
+                    qDebug() << validation;
+                    //ligne.validation = validation;
+                    validation->setObjectName("validation_" + QString::number(id_liste));
+                    layout->addWidget(validation);
 
-                        zone_projet->addWidget(ligne);
-                        ui->verticalLayout_12->addWidget(projet);
-                    }
+                    QLineEdit* contenu = new QLineEdit(data_liste[n].contenu, ligneWidget);
+                    //ligne.contenu = contenu;
+                    contenu->setObjectName("contenu_" + QString::number(id_liste));
+                    layout->addWidget(contenu);
+
+                    QPushButton* supp = new QPushButton("Suppression", ligneWidget);
+                    layout->addWidget(supp);
+
+                    modif_projet(id_element, data_element, data_liste, data_contenue_liste);
+
+                    zone_projet->addWidget(ligneWidget);
+                    ui->verticalLayout_12->addWidget(projet);
+
+                    //vector_ligne_contenu.push_back(ligne);
+
+                    sauve_num++;
                 }
             }
-            
+
+            ajout_liste_modif(id_element, data_contenue_liste);
         });
 }
 
-void Qt_main::modif_projet() {
+void Qt_main::modif_projet(int id_element, std::vector<BDD::LigneElement> data_element, std::vector<BDD::LigneListe> data_liste, const std::vector<BDD::LigneContenueElement> data_contenue_liste) {
+
+
+    connect(ui->pushButton_13, &QPushButton::clicked, this, [this, id_element, data_element, data_liste, data_contenue_liste]() {
+        
+        //NB Liste
+        int max_liste = 0;
+        for (int f = 0; f < data_contenue_liste.size(); f++) {
+
+            for (int h = 0; h < data_liste.size(); h++) {
+
+                if (id_element == data_contenue_liste[f].id_element) {
+
+                    if (data_contenue_liste[f].id_liste == data_liste[h].id) {
+                        max_liste++;
+                    }
+                }
+            }
+        }
+
+        //element
+        for (int y = 0; y < data_element.size(); y++) {
+
+            if (id_element == data_element[y].id) {
+                class_BDD.modif_element(id_element, ui->lineEdit_7->text(), ui->lineEdit_8->text());
+            }
+
+        }
+
+        //liste
+        if (ui->verticalLayout_12->count() == max_liste) {
+
+            for (int i = 0; i < data_liste.size(); i++) {
+
+                int id_liste = data_liste[i].id;
+
+                // Retrouver les widgets dynamiques
+                QLineEdit* contenu = this->findChild<QLineEdit*>("contenu_" + QString::number(id_liste));
+                QCheckBox* validation = this->findChild<QCheckBox*>("validation_" + QString::number(id_liste));
+
+                if (!contenu || !validation)
+                    continue; // Le widget n'existe pas → on ignore
+
+
+                QString texte = contenu->text();
+                bool valide = validation->isChecked();
+
+                if (!validation) {
+                    qDebug() << "QCheckBox introuvable pour id_liste =" << id_liste;
+                }
+                else {
+                    qDebug() << "État =" << validation->isChecked();
+                }
+
+                class_BDD.modif_liste(id_liste, texte, valide);
+            }
+        }
+
+        if (ui->verticalLayout_12->count() < max_liste){
+            int reste = max_liste - ui->verticalLayout_12->count();
+
+            int max_update = 0;
+
+            //update
+            if (max_update == ui->verticalLayout_12->count()) {
+                qDebug() << "fin de update";
+            }
+            else {
+                for (int i = 0; i < data_liste.size(); i++) {
+
+                    int id_liste = data_liste[i].id;
+
+                    // Retrouver les widgets dynamiques
+                    QLineEdit* contenu = this->findChild<QLineEdit*>("contenu_" + QString::number(id_liste));
+                    QCheckBox* validation = this->findChild<QCheckBox*>("validation_" + QString::number(id_liste));
+
+                    if (!contenu || !validation)
+                        continue;
+
+
+                    QString texte = contenu->text();
+                    bool valide = validation->isChecked();
+
+                    if (!validation) {
+                        qDebug() << "QCheckBox introuvable pour id_liste =" << id_liste;
+                    }
+                    else {
+                        qDebug() << "État =" << validation->isChecked();
+                    }
+
+                    class_BDD.modif_liste(id_liste, texte, valide);
+
+                    max_update++;
+                }
+            }
+
+            //delete
+            // delete
+            if (reste != 0) {
+
+                // On supprime les derniers éléments de la BDD
+                // Exemple : si reste = 2 → on supprime les 2 derniers ID
+                for (int i = 0; i < reste; i++) {
+
+                    // Récupérer le dernier ID existant dans la BDD
+                    int last_id = data_liste.back().id;
+
+                    // Suppression dans la BDD
+                    class_BDD.delete_liste(last_id);
+
+                    // Retirer aussi de ton vecteur local
+                    //data_liste.pop_back();
+
+                    qDebug() << "Suppression de l'ID =" << last_id;
+                }
+            }
+
+        }
+
+        if (ui->verticalLayout_12->count() > max_liste){
+
+            int reste = ui->verticalLayout_12->count() - max_liste;
+
+            int max_update = 0;
+
+            //update
+            if (max_update == max_liste) {
+                qDebug() << "fin de update";
+            }
+            else {
+                for (int i = 0; i < data_liste.size(); i++) {
+
+                    int id_liste = data_liste[i].id;
+
+                    // Retrouver les widgets dynamiques
+                    QLineEdit* contenu = this->findChild<QLineEdit*>("contenu_" + QString::number(id_liste));
+                    QCheckBox* validation = this->findChild<QCheckBox*>("validation_" + QString::number(id_liste));
+
+                    if (!contenu || !validation)
+                        continue; // Le widget n'existe pas → on ignore
+
+
+                    QString texte = contenu->text();
+                    bool valide = validation->isChecked();
+
+                    if (!validation) {
+                        qDebug() << "QCheckBox introuvable pour id_liste =" << id_liste;
+                    }
+                    else {
+                        qDebug() << "État =" << validation->isChecked();
+                    }
+
+                    class_BDD.modif_liste(id_liste, texte, valide);
+
+                    max_update++;
+                }
+            }
+
+            //poste
+            if (reste != 0) {
+
+                // Création d’un nouvel ID (exemple)
+                int new_id = data_liste.back().id + 1;
+
+                // Retrouver les widgets dynamiques du dernier élément
+                QLineEdit* contenu = this->findChild<QLineEdit*>("contenu_" + QString::number(new_id));
+                QCheckBox* validation = this->findChild<QCheckBox*>("validation_" + QString::number(new_id));
+
+                if (!contenu || !validation) {
+                    qDebug() << "Impossible de trouver les widgets pour new_id =" << new_id;
+                    return;
+                }
+
+                QString texte = contenu->text();
+                bool valide = validation->isChecked();
+
+                // Enregistrer dans la base
+                class_BDD.Poste_liste(texte, valide);
+
+                // décrémenter reste
+                reste -= 1;
+            }
+
+        }
+    });
 
 }
+
+void Qt_main::ajout_liste_modif(int id_element, const std::vector<BDD::LigneContenueElement> data_contenue_liste) {
+
+    connect(ui->pushButton_12, &QPushButton::clicked, this, [this, id_element, data_contenue_liste]() {
+
+        std::vector<BDD::LigneListe> data_liste = class_BDD.Get_liste();
+
+        int new_id = data_liste.back().id + 1;
+
+        // 3) Création du widget principal
+        QWidget* projet = new QWidget(this);
+        QVBoxLayout* zone_projet = new QVBoxLayout(projet);
+
+        QWidget* ligneWidget = new QWidget(projet);
+        QHBoxLayout* layout = new QHBoxLayout(ligneWidget);
+
+        // 4) Checkbox
+        QCheckBox* validation = new QCheckBox(ligneWidget);
+        validation->setObjectName("validation_" + QString::number(new_id));
+        layout->addWidget(validation);
+
+        // 5) LineEdit (contenu vide ou valeur par défaut)
+        QLineEdit* contenu = new QLineEdit("", ligneWidget);
+        contenu->setObjectName("contenu_" + QString::number(new_id));
+        layout->addWidget(contenu);
+
+        // 6) Bouton suppression
+        QPushButton* supp = new QPushButton("Suppression", ligneWidget);
+        layout->addWidget(supp);
+
+        // 7) Ajout au layout principal
+        zone_projet->addWidget(ligneWidget);
+        ui->verticalLayout_12->addWidget(projet);
+
+        // 8) Incrémenter ton compteur
+        conteur_ajout_liste++;
+        });
+}
+
 
 Qt_main::~Qt_main()
 {

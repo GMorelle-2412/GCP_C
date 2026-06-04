@@ -9,6 +9,7 @@
 #include <QSqlError>
 #include <QDebug>
 #include <QCheckBox>
+#include <vector>
 
 class Qt_main : public QMainWindow{
 
@@ -18,10 +19,21 @@ public:
     Qt_main(QWidget *parent = nullptr);
     ~Qt_main();
 
-private:
-    Ui::Qt_mainClass * ui;
+    Ui::Qt_mainClass* ui;
 
     BDD class_BDD;
+
+    /*struct ligne_contenu {
+        int num;
+        QLineEdit* contenu;
+        QCheckBox* validation;
+    };
+
+    std::vector<ligne_contenu> vector_ligne_contenu;*/
+
+private:
+
+    int conteur_ajout_liste = 1;
 
 private slots:
     void page_connection();
@@ -48,5 +60,7 @@ private slots:
 
     void affichage_modif_projet(int id_element, std::vector<BDD::LigneElement> data_element, std::vector<BDD::LigneListe> data_liste, const std::vector<BDD::LigneContenueElement> data_contenue_liste, QPushButton* modif);
 
-    void modif_projet();
+    void modif_projet(int id_element, std::vector<BDD::LigneElement> data_element, std::vector<BDD::LigneListe> data_liste, const std::vector<BDD::LigneContenueElement> data_contenue_liste);
+
+    void ajout_liste_modif(int id_element, const std::vector<BDD::LigneContenueElement> data_contenue_liste);
 };

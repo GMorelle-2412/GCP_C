@@ -95,7 +95,7 @@ void BDD::Suppression_User(){
 
 
 /*Liste*/
-int BDD::Poste_liste(const QString& contenu, const QString& validation)
+int BDD::Poste_liste(const QString& contenu, bool validation)
 {
     QSqlQuery query;
     query.prepare("INSERT INTO liste (contenu, validation, id_user) VALUES (:contenu, :validation, :id_user)");
@@ -132,7 +132,7 @@ std::vector<BDD::LigneListe> BDD::Get_liste() {
         LigneListe ligne;
         ligne.id = query.value("id").toInt();
         ligne.contenu = query.value("contenu").toString();
-        ligne.validation = query.value("validation").toString();
+        ligne.validation = query.value("validation").toBool();
 
         resultat.push_back(ligne);
 
@@ -142,6 +142,32 @@ std::vector<BDD::LigneListe> BDD::Get_liste() {
     }
 
     return resultat;
+}
+
+void BDD::modif_liste(int id, QString contenu, bool validation) {
+    
+    QSqlQuery query;
+    query.prepare("UPDATE liste SET contenu = :contenu, validation = :validation WHERE id = :id");
+    query.bindValue(":id", id);
+    query.bindValue(":contenu", contenu);
+    query.bindValue(":validation", validation);
+
+    if (!query.exec()) {
+        qDebug() << "Erreur SQL Update_liste :" << query.lastError();
+        return;
+    }
+}
+
+void BDD::delete_liste(int id_liste) {
+    
+    QSqlQuery query;
+    query.prepare("DELETE FROM liste WHERE id = :id");
+    query.bindValue(":id", id_liste);
+
+    if (!query.exec()) {
+         qDebug() << "Erreur delete_liste :" << query.lastError().text();
+    }
+
 }
 
 /*Contenu_liste*/
@@ -245,15 +271,23 @@ std::vector<BDD::LigneElement> BDD::Get_element()
     return data_element;
 }
 
-void modif_element(int id) {
+void BDD::modif_element(int id, QString nom, QString description) {
+    
     QSqlQuery query;
     query.prepare("UPDATE element SET nom = :nom, description = :description WHERE id = :id");
     query.bindValue(":id", id);
-    //query.bindValue(":nom", nom);
-    //query.bindValue(":description", description);
+    query.bindValue(":nom", nom);
+    query.bindValue(":description", description);
 
     if (!query.exec()) {
         qDebug() << "Erreur SQL Update_liste :" << query.lastError();
         return;
+    }
+
+    while (query.next()) {
+
+        qDebug() << "id = " << id;
+        qDebug() << "nom = " << nom;
+        qDebug() << "description = " << description;
     }
 }
