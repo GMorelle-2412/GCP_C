@@ -43,9 +43,15 @@
     <ClCompile Include="BDD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="style.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BDD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="style.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

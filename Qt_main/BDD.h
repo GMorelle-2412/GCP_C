@@ -75,4 +75,6 @@ public slots:
 
     void Poste_contenu_liste(int id_element, int id_liste);
 
+    void delete_contenu_liste(int id_liste);
+
 };

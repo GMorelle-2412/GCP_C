@@ -32,9 +32,11 @@ public:
     std::vector<ligne_contenu> vector_ligne_contenu;*/
 
 private:
-    int conteur_ajout_liste = 1;
+    int conteur_ajout_liste = 0;
 
     int verife_reste_liste = -1;
+
+    std::vector<int> table_id_liste_modif;
 
 private slots:
     void page_connection();
@@ -61,10 +63,11 @@ private slots:
 
     void affichage_modif_projet(int id_element, std::vector<BDD::LigneElement> data_element, std::vector<BDD::LigneListe> data_liste, const std::vector<BDD::LigneContenueElement> data_contenue_liste, QPushButton* modif);
 
+    void ajout_liste_modif(int id_element, const std::vector<BDD::LigneContenueElement> data_contenue_liste);
+
     void modif_projet(int id_element,
         std::vector<BDD::LigneElement> data_element,
         std::vector<BDD::LigneListe>data_liste,
         const std::vector<BDD::LigneContenueElement> data_contenue_liste);
     
-        void ajout_liste_modif(int id_element, const std::vector<BDD::LigneContenueElement> data_contenue_liste);
 };

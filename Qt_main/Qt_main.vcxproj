@@ -92,6 +92,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="style.cpp" />
     <QtRcc Include="Qt_main.qrc" />
     <QtUic Include="Qt_main.ui" />
     <QtMoc Include="Qt_main.h" />
@@ -101,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BDD.h" />
+    <ClInclude Include="style.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

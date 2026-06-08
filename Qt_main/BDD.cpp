@@ -217,6 +217,14 @@ std::vector<BDD::LigneContenueElement>BDD::Get_contenu_liste() {
     return data_contenu_liste;
 }
 
+void BDD::delete_contenu_liste(int id_liste) {
+    QSqlQuery query;
+    query.prepare("DELETE FROM contenu_liste WHERE id_liste = :id");
+    query.bindValue(":id", id_liste);
+    if (!query.exec())
+        qDebug() << "Erreur delete_contenu_liste :" << query.lastError().text();
+}
+
 /*Element*/
 void BDD::Poste_element(const QString& nom, const QString& description) {
 
