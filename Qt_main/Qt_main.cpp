@@ -233,67 +233,112 @@ void Qt_main::creation_projet(){
 void Qt_main::affiche_element_liste() {
 
     std::vector<BDD::LigneListe> data_liste = class_BDD.Get_liste();
-    std::vector<BDD::LigneContenueElement> data_contenue_liste = class_BDD.Get_contenu_liste();
+    std::vector<BDD::LigneContenueElement> data_contenue = class_BDD.Get_contenu_liste();
     std::vector<BDD::LigneElement> data_element = class_BDD.Get_element();
 
-    int verification_element = 0;
+    // On vide le layout avant de recréer l'affichage
+    QLayoutItem* item;
+    while ((item = ui->verticalLayout_9->takeAt(0)) != nullptr) {
+        if (item->widget()) delete item->widget();
+        delete item;
+    }
 
-    for (int i = 0; i < data_liste.size(); i++) {
+    // Pour éviter de créer plusieurs fois le même projet
+    std::vector<int> elements_deja_crees;
 
+    for (int i = 0; i < data_element.size(); i++) {
+
+        int id_element = data_element[i].id;
+
+        // Vérifier si cet élément a déjà été traité
+        bool deja_cree = false;
+        for (int d = 0; d < elements_deja_crees.size(); d++) {
+            if (elements_deja_crees[d] == id_element) {
+                deja_cree = true;
+                break;
+            }
+        }
+        if (deja_cree) continue;
+
+        // Vérifier si cet élément a au moins une ligne associée
+        bool a_au_moins_une_ligne = false;
+        for (int j = 0; j < data_contenue.size(); j++) {
+            if (data_contenue[j].id_element == id_element) {
+                a_au_moins_une_ligne = true;
+                break;
+            }
+        }
+        if (!a_au_moins_une_ligne) continue;
+
+        // On marque cet élément comme déjà créé
+        elements_deja_crees.push_back(id_element);
+
+        // Séparateur entre projets (sauf avant le tout premier)
+        if (ui->verticalLayout_9->count() > 0) {
+            QFrame* sep = new QFrame(this);
+            sep->setFrameShape(QFrame::HLine);
+            sep->setFixedHeight(1);
+            sep->setStyleSheet("background-color: #3F3F3F; margin: 6px 0px;");
+            ui->verticalLayout_9->addWidget(sep);
+        }
+
+        // Carte projet
         QWidget* projet = new QWidget(this);
+        projet->setObjectName("carte_projet");
+        projet->setStyleSheet(
+            "QWidget#carte_projet {"
+            "   background-color: #2A2A2A;"
+            "   border-left: 3px solid #E67E22;"
+            "   border-radius: 4px;"
+            "   padding: 4px;"
+            "}"
+        );
+
         QVBoxLayout* zone_projet = new QVBoxLayout(projet);
-        zone_projet->setContentsMargins(0, 0, 0, 0);
+        zone_projet->setContentsMargins(10, 8, 8, 8);
+        zone_projet->setSpacing(4);
 
+        // Nom + description
+        QLabel* nom = new QLabel(data_element[i].nom, projet);
+        zone_projet->addWidget(nom);
 
-        for (int j = 0; j < data_contenue_liste.size(); j++) {
+        QLabel* description = new QLabel(data_element[i].description, projet);
+        description->setStyleSheet("color: #A0A0A0; font-size: 9pt;");
+        zone_projet->addWidget(description);
 
-            if (data_liste[i].id == data_contenue_liste[j].id_liste) {
+        // Bouton modification
+        QPushButton* modif = new QPushButton("Modification", projet);
+        zone_projet->addWidget(modif);
 
-                for (int k = 0; k < data_element.size(); k++) {
+        affichage_modif_projet(id_element, data_element, data_liste, data_contenue, modif);
 
-                    if (data_contenue_liste[j].id_element == data_element[k].id) {
+        // Lignes associées à ce projet
+        for (int j = 0; j < data_contenue.size(); j++) {
 
-                        if (verification_element != data_contenue_liste[j].id_element) {
+            if (data_contenue[j].id_element == id_element) {
 
-                            QLabel* nom = new QLabel(data_element[k].nom, projet);
-                            zone_projet->addWidget(nom);
+                int id_liste = data_contenue[j].id_liste;
 
-                            QLabel* description = new QLabel(data_element[k].description, projet);
-                            zone_projet->addWidget(description);
+                for (int k = 0; k < data_liste.size(); k++) {
 
-                            verification_element = data_contenue_liste[j].id_element;
+                    if (data_liste[k].id == id_liste) {
 
-                            QPushButton* modif = new QPushButton("Modification", projet);
-                            zone_projet->addWidget(modif);
+                        QWidget* ligne = new QWidget(projet);
+                        QHBoxLayout* layout = new QHBoxLayout(ligne);
 
-                            // Appel correct
-                            affichage_modif_projet(data_element[k].id, data_element, data_liste, data_contenue_liste, modif);
+                        QCheckBox* validation = new QCheckBox(ligne);
+                        validation->setChecked(data_liste[k].validation);
+                        layout->addWidget(validation);
 
-                        }
+                        QLabel* contenu = new QLabel(data_liste[k].contenu, ligne);
+                        layout->addWidget(contenu);
+
+                        zone_projet->addWidget(ligne);
                     }
                 }
             }
         }
 
-        // Ligne contenant checkbox + nom de la liste
-        QWidget* ligne = new QWidget(projet);
-        QHBoxLayout* layout = new QHBoxLayout(ligne);
-        layout->setContentsMargins(0, 0, 0, 0);
-
-        QCheckBox* validation = new QCheckBox(ligne);
-        validation->setChecked(data_liste[i].validation);
-        layout->addWidget(validation);
-
-        QLabel* contenu = new QLabel(data_liste[i].contenu, ligne);
-        layout->addWidget(contenu);
-
-        QPushButton* supp = new QPushButton("Suppression", ligne);
-        layout->addWidget(supp);
-
-        // On ajoute la ligne dans le projet
-        zone_projet->addWidget(ligne);
-
-        // On ajoute le projet dans le layout principal
         ui->verticalLayout_9->addWidget(projet);
     }
 }

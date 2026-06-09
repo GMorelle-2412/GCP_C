@@ -1,13 +1,12 @@
 #pragma once
-#ifndef STYLE_H
-#define STYLE_H
 
 #include <QMainWindow>
+#include <QString>
 
 class Style
 {
 public:
-    static void appliquerStyle(QMainWindow* window);
-};
+    static void appliquerStyle(QMainWindow* fenetre);
 
-#endif
+    
+};

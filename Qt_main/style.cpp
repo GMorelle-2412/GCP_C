@@ -1,113 +1,333 @@
-#include "Style.h"
+﻿#include "Style.h"
 
-void Style::appliquerStyle(QMainWindow* window)
+void Style::appliquerStyle(QMainWindow* fenetre)
 {
-    window->setStyleSheet(R"(
+    const QString styleGlobal = R"(
 
-/* Fen�tre principale */
-QMainWindow,
-QWidget {
-    background-color: #232323;
-    color: white;
-    font-family: "Segoe UI";
-}
+        /* ── Base ──────────────────────────────────────────────────────────── */
+        QMainWindow, QWidget {
+            background-color: #232323;
+            color: #F0F0F0;
+            font-family: "Segoe UI", "Arial", sans-serif;
+            font-size: 10pt;
+        }
 
-/* Titre GCP */
-QLabel#label_titre {
-    color: #E67E22;
-    font-size: 50px;
-    font-weight: bold;
-}
+        /* ── Labels ─────────────────────────────────────────────────────────── */
+        QLabel {
+            color: #F0F0F0;
+            background-color: transparent;
+        }
 
-/* Labels */
-QLabel {
-    color: white;
-    font-size: 14px;
-}
+        QLabel#label_titre, QLabel#label_5 {
+            color: #E67E22;
+            font-size: 38pt;
+            font-weight: 700;
+            letter-spacing: 4px;
+        }
 
-/* Champs texte */
-QLineEdit {
-    background-color: #2F2F2F;
-    border: 2px solid #E67E22;
-    border-radius: 5px;
-    padding: 6px;
-    color: white;
-    min-height: 28px;
-}
+        QLabel#label_6 {
+            color: #E67E22;
+            font-size: 11pt;
+            font-weight: 600;
+        }
 
-QLineEdit:focus {
-    border: 2px solid #F39C12;
-}
+        QLabel#label,  QLabel#label_2,
+        QLabel#label_3, QLabel#label_4 {
+            color: #A0A0A0;
+            font-size: 8pt;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
 
-/* Boutons principaux */
-QPushButton {
-    background-color: #232323;
-    color: #E67E22;
-    border: 2px solid #E67E22;
-    border-radius: 5px;
-    min-height: 35px;
-    padding: 5px;
-}
+        /* ── Champs de saisie ───────────────────────────────────────────────── */
+        QLineEdit {
+            background-color: #2E2E2E;
+            color: #F0F0F0;
+            border: none;
+            border-bottom: 2px solid #3F3F3F;
+            border-radius: 0px;
+            padding: 6px 4px;
+            selection-background-color: #E67E22;
+            selection-color: #232323;
+            min-height: 28px;
+        }
 
-QPushButton:hover {
-    background-color: #E67E22;
-    color: black;
-}
+        QLineEdit:focus {
+            border-bottom: 2px solid #E67E22;
+            background-color: #2E2E2E;
+        }
 
-QPushButton:pressed {
-    background-color: #D35400;
-    color: white;
-}
+        QLineEdit:hover {
+            border-bottom: 2px solid #C0691A;
+        }
 
-/* Cases � cocher */
-QCheckBox {
-    color: white;
-}
+        /* ── Boutons principaux ─────────────────────────────────────────────── */
+        QPushButton#pushButton,
+        QPushButton#pushButton_2 {
+            background-color: transparent;
+            color: #E67E22;
+            border: 2px solid #E67E22;
+            border-radius: 4px;
+            padding: 10px 24px;
+            font-size: 10pt;
+            font-weight: 600;
+            letter-spacing: 1px;
+            min-width: 140px;
+            min-height: 40px;
+        }
 
-QCheckBox::indicator {
-    width: 18px;
-    height: 18px;
-}
+        QPushButton#pushButton:hover,
+        QPushButton#pushButton_2:hover {
+            background-color: #E67E22;
+            color: #232323;
+        }
 
-QCheckBox::indicator:unchecked {
-    border: 2px solid #E67E22;
-    background: transparent;
-}
+        QPushButton#pushButton:pressed,
+        QPushButton#pushButton_2:pressed {
+            background-color: #C0691A;
+            border-color: #C0691A;
+            color: #F0F0F0;
+        }
 
-QCheckBox::indicator:checked {
-    border: 2px solid #E67E22;
-    background: #E67E22;
-}
+        /* ── Boutons validation formulaires ─────────────────────────────────── */
+        QPushButton#pushButton_3,
+        QPushButton#pushButton_5,
+        QPushButton#pushButton_8,
+        QPushButton#pushButton_10,
+        QPushButton#pushButton_13 {
+            background-color: transparent;
+            color: #E67E22;
+            border: 2px solid #E67E22;
+            border-radius: 4px;
+            padding: 10px 24px;
+            font-size: 10pt;
+            font-weight: 600;
+            letter-spacing: 1px;
+            min-width: 140px;
+            min-height: 40px;
+        }
 
-/* ScrollArea */
-QScrollArea {
-    border: 1px solid #444;
-    border-radius: 5px;
-    background-color: #2F2F2F;
-}
+        QPushButton#pushButton_3:hover,
+        QPushButton#pushButton_5:hover,
+        QPushButton#pushButton_8:hover,
+        QPushButton#pushButton_10:hover,
+        QPushButton#pushButton_13:hover {
+            background-color: #E67E22;
+            color: #232323;
+        }
 
-/* Barre de d�filement verticale */
-QScrollBar:vertical {
-    background: #2F2F2F;
-    width: 12px;
-}
+        QPushButton#pushButton_3:pressed,
+        QPushButton#pushButton_5:pressed,
+        QPushButton#pushButton_8:pressed,
+        QPushButton#pushButton_10:pressed,
+        QPushButton#pushButton_13:pressed {
+            background-color: #C0691A;
+            border-color: #C0691A;
+            color: #F0F0F0;
+        }
 
-QScrollBar::handle:vertical {
-    background: #E67E22;
-    border-radius: 5px;
-}
+        /* ── Boutons annulation ──────────────────────────────────────────────── */
+        QPushButton#pushButton_4,
+        QPushButton#pushButton_6,
+        QPushButton#pushButton_9,
+        QPushButton#pushButton_14 {
+            background-color: transparent;
+            color: #A0A0A0;
+            border: 2px solid #3F3F3F;
+            border-radius: 4px;
+            padding: 10px 24px;
+            font-size: 10pt;
+            min-width: 140px;
+            min-height: 40px;
+        }
 
-QScrollBar::add-line:vertical,
-QScrollBar::sub-line:vertical {
-    height: 0px;
-}
+        QPushButton#pushButton_4:hover,
+        QPushButton#pushButton_6:hover,
+        QPushButton#pushButton_9:hover,
+        QPushButton#pushButton_14:hover {
+            background-color: #3A3A3A;
+            color: #F0F0F0;
+            border-color: #606060;
+        }
 
-/* Zone projet */
-#scrollAreaWidgetContents,
-#scrollAreaWidgetContents_2,
-#scrollAreaWidgetContents_3 {
-    background-color: #2F2F2F;
-}
+        /* ── Bouton Déconnexion ──────────────────────────────────────────────── */
+        QPushButton#pushButton_7 {
+            background-color: transparent;
+            color: #A0A0A0;
+            border: 1px solid #3F3F3F;
+            border-radius: 4px;
+            padding: 4px 14px;
+            font-size: 9pt;
+        }
 
-)");
+        QPushButton#pushButton_7:hover {
+            background-color: #3A3A3A;
+            color: #F0F0F0;
+            border-color: #606060;
+        }
+
+        /* ── Boutons Ajouter ─────────────────────────────────────────────────── */
+        QPushButton#pushButton_11,
+        QPushButton#pushButton_12 {
+            background-color: #2E2E2E;
+            color: #E67E22;
+            border: 1px dashed #E67E22;
+            border-radius: 4px;
+            padding: 6px 16px;
+            font-size: 9pt;
+        }
+
+        QPushButton#pushButton_11:hover,
+        QPushButton#pushButton_12:hover {
+            background-color: #3A3A3A;
+        }
+
+
+
+        /* ── Boutons dynamiques ──────────────────────────────────────────────── */
+        QPushButton[text="Modification"] {
+            background-color: transparent;
+            color: #E67E22;
+            border: 1px solid #E67E22;
+            border-radius: 3px;
+            padding: 4px 10px;
+            font-size: 8pt;
+        }
+
+        QPushButton[text="Modification"]:hover {
+            background-color: #E67E22;
+            color: #232323;
+        }
+
+        QPushButton[text="Suppression"] {
+            background-color: transparent;
+            color: #A0A0A0;
+            border: 1px solid #3F3F3F;
+            border-radius: 3px;
+            padding: 4px 10px;
+            font-size: 8pt;
+        }
+
+        QPushButton[text="Suppression"]:hover {
+            background-color: #3A3A3A;
+            color: #F0F0F0;
+        }
+
+        QPushButton[text="X"] {
+            background-color: transparent;
+            color: #606060;
+            border: 1px solid #3F3F3F;
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-size: 9pt;
+            max-width: 28px;
+            max-height: 28px;
+        }
+
+        QPushButton[text="X"]:hover {
+            color: #E67E22;
+            border-color: #E67E22;
+        }
+
+        /* ── Cases à cocher ──────────────────────────────────────────────────── */
+        QCheckBox {
+            color: #F0F0F0;
+            spacing: 6px;
+            background-color: transparent;
+        }
+
+        QCheckBox::indicator {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #3F3F3F;
+            border-radius: 3px;
+            background-color: #2E2E2E;
+        }
+
+        QCheckBox::indicator:hover {
+            border-color: #E67E22;
+        }
+
+        QCheckBox::indicator:checked {
+            background-color: #E67E22;
+            border-color: #E67E22;
+        }
+
+        /* ── ScrollArea principale (page liste projets) ──────────────────────── */
+        /* Marges latérales pour rendu "colonne centrée façon mobile" */
+        QScrollArea#scrollArea {
+            background-color: #232323;
+            border: none;
+            /*margin-left: 180px;
+            margin-right: 180px;*/
+        }
+
+        QScrollArea#scrollArea > QWidget > QWidget {
+            background-color: #232323;
+        }
+
+        /* ── ScrollAreas secondaires (création / modification) ───────────────── */
+        QScrollArea#scrollArea_2,
+        QScrollArea#scrollArea_3 {
+            background-color: #2E2E2E;
+            border: 1px solid #3F3F3F;
+            border-radius: 4px;
+        }
+
+        QScrollArea#scrollArea_2 > QWidget > QWidget,
+        QScrollArea#scrollArea_3 > QWidget > QWidget {
+            background-color: #2E2E2E;
+        }
+
+        /* ── Scrollbars ──────────────────────────────────────────────────────── */
+        QScrollBar:vertical {
+            background-color: #232323;
+            width: 8px;
+            border-radius: 4px;
+        }
+
+        QScrollBar::handle:vertical {
+            background-color: #3F3F3F;
+            border-radius: 4px;
+            min-height: 30px;
+        }
+
+        QScrollBar::handle:vertical:hover {
+            background-color: #E67E22;
+        }
+
+        QScrollBar::add-line:vertical,
+        QScrollBar::sub-line:vertical {
+            height: 0px;
+        }
+
+        QScrollBar:horizontal {
+            background-color: #232323;
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        QScrollBar::handle:horizontal {
+            background-color: #3F3F3F;
+            border-radius: 4px;
+            min-width: 30px;
+        }
+
+        QScrollBar::handle:horizontal:hover {
+            background-color: #E67E22;
+        }
+
+        QScrollBar::add-line:horizontal,
+        QScrollBar::sub-line:horizontal {
+            width: 0px;
+        }
+
+        /* ── StackedWidget ───────────────────────────────────────────────────── */
+        QStackedWidget {
+            background-color: #232323;
+        }
+
+    )";
+
+    fenetre->setStyleSheet(styleGlobal);
 }

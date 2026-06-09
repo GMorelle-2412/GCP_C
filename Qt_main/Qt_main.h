@@ -22,6 +22,7 @@ public:
     Ui::Qt_mainClass* ui;
 
     BDD class_BDD;
+    
 
     /*struct ligne_contenu {
         int num;
