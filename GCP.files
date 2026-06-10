@@ -1,0 +1,10 @@
+Qt_main/BDD.cpp
+Qt_main/BDD.h
+Qt_main/Qt_main.cpp
+Qt_main/Qt_main.h
+Qt_main/main.cpp
+Qt_main/style.cpp
+Qt_main/style.h
+Qt_main/x64/Debug/qt/moc/moc_Qt_main.cpp
+Qt_main/x64/Debug/qt/rcc/qrc_Qt_main.cpp
+Qt_main/x64/Debug/qt/uic/ui_Qt_main.h

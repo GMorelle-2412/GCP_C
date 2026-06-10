@@ -360,4 +360,30 @@ MigrationBackup/
 .ionide/
 
 # Fody - auto-generated XML schema
+
+# Build
+build/
+*.pro.user
+
+# Qt Creator
+*.creator
+*.config
+*.files
+*.includes
+*.cflags
+*.cxxflags
+
+# Android build
+android-build/
+
+# Qt Creator generated
+*.cflags
+*.cxxflags
+*.config
+*.creator
+*.files
+*.includes
+
+# Build folders
+build/
 FodyWeavers.xsd
