@@ -7,6 +7,10 @@
 #include <qdir.h>
 #include <vector>
 #include <QString>
+#include <QDir>
+#include <QFile>
+#include <QStandardPaths>
+
 
 class BDD{
 

@@ -24,6 +24,13 @@ android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 }
 
+# Copier BDD.db dans le dossier de build sur Windows
+win32 {
+    BDD_SOURCE = $$PWD/BDD.db
+    BDD_DEST = $$OUT_PWD/BDD.db
+    QMAKE_POST_LINK += copy /Y \"$$replace(BDD_SOURCE, /, \\)\" \"$$replace(BDD_DEST, /, \\)\"
+}
+
 DISTFILES += \
     android/AndroidManifest.xml \
     android/build.gradle \

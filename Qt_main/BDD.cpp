@@ -1,17 +1,39 @@
 #include "BDD.h"
+#include <QStandardPaths>
+#include <QFile>
+#include <QDir>
 
-void BDD::Connect_BDD(){
+void BDD::Connect_BDD() {
+    QString dbPath;
+
+#ifdef Q_OS_ANDROID
+    // Chemin writeable sur Android
+    dbPath = QStandardPaths::writableLocation(
+        QStandardPaths::AppDataLocation) + "/BDD.db";
+
+    // Copier la BDD depuis les ressources si elle n'existe pas
+    if (!QFile::exists(dbPath)) {
+        QDir dir;
+        dir.mkpath(QStandardPaths::writableLocation(
+            QStandardPaths::AppDataLocation));
+
+        QFile::copy(":/BDD/BDD.db", dbPath);
+        QFile::setPermissions(dbPath,
+            QFile::ReadOwner | QFile::WriteOwner);
+    }
+#else
+    // Windows — chemin local
+    dbPath = "BDD.db";
+#endif
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("BDD.db");
-
-    //qDebug() << "Chemin courant =" << QDir::currentPath();
+    db.setDatabaseName(dbPath);
 
     if (!db.open()) {
         qDebug() << "Erreur ouverture DB:" << db.lastError().text();
     }
     else {
-        qDebug() << "Ouverture DB";
+        qDebug() << "Ouverture DB succès :" << dbPath;
     }
 }
 

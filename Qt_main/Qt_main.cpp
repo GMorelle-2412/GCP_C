@@ -382,18 +382,23 @@ void Qt_main::affichage_modif_projet(int id_element, std::vector<BDD::LigneEleme
 
                         QWidget* ligneWidget = new QWidget(projet);
                         QHBoxLayout* layout = new QHBoxLayout(ligneWidget);
+                        layout->setContentsMargins(0, 0, 0, 0);
 
                         QCheckBox* validation = new QCheckBox(ligneWidget);
                         validation->setChecked(l.validation);
+                        validation->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
                         layout->addWidget(validation);
 
                         QLineEdit* contenu = new QLineEdit(l.contenu, ligneWidget);
-                        layout->addWidget(contenu);
+                        layout->addWidget(contenu); // prend tout l'espace
 
-                        QPushButton* supp = new QPushButton("Suppression", ligneWidget);
-                        layout->addWidget(supp);
+                        QPushButton* supp = new QPushButton("X", ligneWidget);
+                        supp->setObjectName("bouton_x");
+                        supp->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-                        zone_projet->addWidget(ligneWidget);
+                        zone_projet->addWidget(ligneWidget); // ← seulement ligneWidget ici
+
+                        zone_projet->addWidget(supp);     // ← dans le layout horizontal !
                         ui->verticalLayout_12->addWidget(projet);
 
                         connect(supp, &QPushButton::clicked, this, [projet]() {

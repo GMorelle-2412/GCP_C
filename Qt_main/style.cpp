@@ -26,7 +26,7 @@ void Style::appliquerStyle(QMainWindow* fenetre)
         }
 
         QLabel#label_6 {
-            color: #E67E22;
+            color: rgb(180, 180, 180);            
             font-size: 11pt;
             font-weight: 600;
         }
@@ -72,8 +72,7 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             font-size: 10pt;
             font-weight: 600;
             letter-spacing: 1px;
-            min-width: 140px;
-            min-height: 40px;
+            min-height: 20px;
         }
 
         QPushButton#pushButton:hover,
@@ -103,7 +102,6 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             font-size: 10pt;
             font-weight: 600;
             letter-spacing: 1px;
-            min-width: 140px;
             min-height: 40px;
         }
 
@@ -137,7 +135,6 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             border-radius: 4px;
             padding: 10px 24px;
             font-size: 10pt;
-            min-width: 140px;
             min-height: 40px;
         }
 
@@ -220,7 +217,6 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             border-radius: 3px;
             padding: 2px 6px;
             font-size: 9pt;
-            max-width: 28px;
             max-height: 28px;
         }
 
