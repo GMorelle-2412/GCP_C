@@ -50,7 +50,9 @@ public slots:
     void Connect_BDD();
 
     /*users*/
-    void Connection(const QString& nom, const QString& mdp);
+    bool Connection(const QString& nom, const QString& mdp); // void ? bool
+
+    void Connection_auto(const QString& nom);
 
     void Inscription(const QString& nom, const QString& mdp);
 

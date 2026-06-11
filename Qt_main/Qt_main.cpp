@@ -1,6 +1,9 @@
 ﻿#include "Qt_main.h"
 #include "Style.h"
 
+#include <QScroller>
+#include <QEasingCurve>
+
 Qt_main::Qt_main(QWidget* parent)
     : QMainWindow(parent),
     ui(new Ui::Qt_mainClass)
@@ -26,6 +29,50 @@ Qt_main::Qt_main(QWidget* parent)
 
     ajouter_liste();
     creation_projet();
+
+    // Fonction helper pour appliquer les propriétés sur une scrollArea
+#include <QEasingCurve>
+
+    auto configScrollerUltraSmooth = [](QScrollArea* area) {
+        QScroller* scroller = QScroller::scroller(area->viewport());
+        QScroller::grabGesture(area->viewport(), QScroller::TouchGesture);
+
+        QScrollerProperties props = scroller->scrollerProperties();
+
+        // --- Sensation immédiate au toucher ---
+        props.setScrollMetric(QScrollerProperties::DragStartDistance, 0.0001);
+        props.setScrollMetric(QScrollerProperties::DragVelocitySmoothingFactor, 0.05);
+        props.setScrollMetric(QScrollerProperties::AxisLockThreshold, 0.85);
+
+        // --- Inertie ultra fluide ---
+        props.setScrollMetric(QScrollerProperties::DecelerationFactor, 0.06);
+        props.setScrollMetric(QScrollerProperties::MaximumVelocity, 4.0);
+        props.setScrollMetric(QScrollerProperties::MinimumVelocity, 0.02);
+
+        // --- Flick très dynamique ---
+        props.setScrollMetric(QScrollerProperties::AcceleratingFlickMaximumTime, 0.35);
+        props.setScrollMetric(QScrollerProperties::AcceleratingFlickSpeedupFactor, 1.8);
+
+        // --- Micro-overshoot (effet premium) ---
+        props.setScrollMetric(QScrollerProperties::OvershootDragResistanceFactor, 0.15);
+        props.setScrollMetric(QScrollerProperties::OvershootScrollDistanceFactor, 0.04);
+        props.setScrollMetric(QScrollerProperties::OvershootScrollTime, 0.12);
+
+        // --- Courbe d’animation ultra smooth ---
+        props.setScrollMetric(
+            QScrollerProperties::ScrollingCurve,
+            QVariant::fromValue(QEasingCurve(QEasingCurve::OutQuint))
+        );
+
+        scroller->setScrollerProperties(props);
+
+        area->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        };
+
+    configScrollerUltraSmooth(ui->scrollArea);
+    configScrollerUltraSmooth(ui->scrollArea_2);
+    configScrollerUltraSmooth(ui->scrollArea_3);
 }
 
 
@@ -43,9 +90,22 @@ void Qt_main::page_inscription() {
         });
 }
 
-void Qt_main::bouton_connection(){
-    connect(ui->pushButton_5, &QPushButton::clicked, this, [this]() {
+void Qt_main::bouton_connection()
+{
+    // ── Auto-login au démarrage ──────────────────────────────────────────
+    QSettings settings("MonApp", "Auth");
+    bool auto_login = settings.value("auto_login", false).toBool();
+    QString saved_user = settings.value("username", "").toString();
 
+    if (auto_login && !saved_user.isEmpty()) {
+        class_BDD.Connection_auto(saved_user); // connexion sans mdp
+        ui->stackedWidget->setCurrentIndex(3);
+        affiche_info_user();
+        affiche_element_liste();
+    }
+
+    // ── Connexion manuelle ───────────────────────────────────────────────
+    connect(ui->pushButton_5, &QPushButton::clicked, this, [this]() {
         QString nom = ui->lineEdit_3->text();
         QString mdp = ui->lineEdit_4->text();
 
@@ -54,13 +114,19 @@ void Qt_main::bouton_connection(){
             return;
         }
 
-        class_BDD.Connection(nom, mdp);
+        if (class_BDD.Connection(nom, mdp)) {
+            // Sauvegarde pour auto-login la prochaine fois
+            QSettings settings("MonApp", "Auth");
+            settings.setValue("auto_login", true);
+            settings.setValue("username", nom);
 
-        ui->stackedWidget->setCurrentIndex(3);
-
-        affiche_info_user();
-
-        affiche_element_liste();
+            ui->stackedWidget->setCurrentIndex(3);
+            affiche_info_user();
+            affiche_element_liste();
+        }
+        else {
+            qDebug() << "Identifiants incorrects";
+        }
         });
 }
 
@@ -87,22 +153,26 @@ void Qt_main::affiche_info_user() {
 
 void Qt_main::bouton_deconection() {
     connect(ui->pushButton_7, &QPushButton::clicked, this, [this]() {
-       
+
+        // ── Supprime l'auto-login ────────────────────────────────────────
+        QSettings settings("MonApp", "Auth");
+        settings.setValue("auto_login", false);
+        settings.remove("username");
+
+        // ── Reset BDD ───────────────────────────────────────────────────
         class_BDD.id_user = 0;
         class_BDD.nom_user = "nul";
 
+        // ── Vide la liste ───────────────────────────────────────────────
         while (ui->verticalLayout_9->count() > 0) {
             QLayoutItem* item = ui->verticalLayout_9->takeAt(0);
-
             if (item->widget())
                 item->widget()->deleteLater();
-
             delete item;
         }
 
         ui->stackedWidget->setCurrentIndex(0);
         });
-
 }
 
 void Qt_main::bouton_annulation() {
@@ -119,6 +189,8 @@ void Qt_main::bouton_annulation() {
     //Création élément 
     connect(ui->pushButton_9, &QPushButton::clicked, this, [this]() {
         ui->stackedWidget->setCurrentIndex(3);
+        affiche_info_user();
+        affiche_element_liste();
 
         // Vider le layout
         while (ui->verticalLayout_8->count() > 0) {
@@ -134,6 +206,8 @@ void Qt_main::bouton_annulation() {
     //Modif element
     connect(ui->pushButton_14, &QPushButton::clicked, this, [this]() {
         ui->stackedWidget->setCurrentIndex(3);
+        affiche_info_user();
+        affiche_element_liste();
         
         // Vider le layout
         while (ui->verticalLayout_12->count() > 0) {
@@ -156,48 +230,69 @@ void Qt_main::bouton_creation_projet() {
         });
 }
 
-void Qt_main::ajouter_liste(){
+void Qt_main::ajouter_liste() {
 
     connect(ui->pushButton_11, &QPushButton::clicked, this, [this]() {
 
+        // Retirer le stretch s'il existe déjà (toujours en dernière position)
+        int last = ui->verticalLayout_8->count() - 1;
+        if (last >= 0) {
+            QLayoutItem* lastItem = ui->verticalLayout_8->itemAt(last);
+            if (lastItem && !lastItem->widget()) {
+                ui->verticalLayout_8->takeAt(last);
+                delete lastItem;
+            }
+        }
+
         QWidget* ligne = new QWidget(this);
-        QHBoxLayout* layoutLigne = new QHBoxLayout(ligne);
-        layoutLigne->setContentsMargins(0, 0, 0, 0);
+        ligne->setMaximumHeight(120);
+        QVBoxLayout* zone = new QVBoxLayout(ligne);
+        zone->setContentsMargins(8, 8, 8, 8);
+        zone->setSpacing(6);
 
-        QCheckBox* check_box = new QCheckBox(ligne);
-        QLineEdit* edit = new QLineEdit(ligne);
-        QPushButton* btnSupprimer = new QPushButton("X", ligne);
-        btnSupprimer->setFixedWidth(30);
+        QWidget* rangee = new QWidget(ligne);
 
-        layoutLigne->addWidget(check_box);
-        layoutLigne->addWidget(edit);
-        layoutLigne->addWidget(btnSupprimer);
+        QHBoxLayout* layoutRangee = new QHBoxLayout(rangee);
+        layoutRangee->setContentsMargins(0, 0, 0, 0);
+        layoutRangee->setSpacing(8);
+
+        QCheckBox* validation = new QCheckBox(rangee);
+        QLineEdit* contenu = new QLineEdit("", rangee);
+        layoutRangee->addWidget(validation);
+        layoutRangee->addWidget(contenu);
+
+        QPushButton* supp = new QPushButton("X", ligne);
+        supp->setFixedHeight(36);
+        supp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+        zone->addWidget(rangee);
+        zone->addWidget(supp);
 
         ui->verticalLayout_8->addWidget(ligne);
+        ui->verticalLayout_8->addStretch();  // ← toujours en dernier
 
-        connect(btnSupprimer, &QPushButton::clicked, this, [this, ligne]() {
-            ui->verticalLayout_8->removeWidget(ligne);
+        connect(supp, &QPushButton::clicked, this, [ligne]() {
             ligne->deleteLater();
             });
         });
 }
 
-void Qt_main::creation_projet(){
+void Qt_main::creation_projet() {
     connect(ui->pushButton_10, &QPushButton::clicked, this, [this]() {
 
-        // 1) Enregistrer l’élément principal
+        // 1) Enregistrer l'élément principal
         QString nom = ui->lineEdit_5->text();
         QString description = ui->lineEdit_6->text();
 
-        class_BDD.Poste_element(nom, description);   // met à jour id_element
+        class_BDD.Poste_element(nom, description);
 
-        class_BDD.id_liste.clear(); // IMPORTANT : vider avant de remplir
+        class_BDD.id_liste.clear();
 
         // 2) Enregistrer chaque ligne
         for (int i = 0; i < ui->verticalLayout_8->count(); i++) {
 
             QWidget* ligne = ui->verticalLayout_8->itemAt(i)->widget();
-            if (!ligne) continue;
+            if (!ligne) continue;  // ← ignore le stretch (qui n'est pas un widget)
 
             QLineEdit* edit = ligne->findChild<QLineEdit*>();
             QCheckBox* check = ligne->findChild<QCheckBox*>();
@@ -207,10 +302,7 @@ void Qt_main::creation_projet(){
             QString contenu = edit->text();
             bool validation = check->isChecked();
 
-            // Récupérer l’ID de la ligne insérée
             int id = class_BDD.Poste_liste(contenu, validation);
-
-            // Stocker l’ID
             class_BDD.id_liste.push_back(id);
         }
 
@@ -219,7 +311,7 @@ void Qt_main::creation_projet(){
             class_BDD.Poste_contenu_liste(class_BDD.id_element, id_l);
         }
 
-        // 4) Nettoyer l’interface
+        // 4) Nettoyer l'interface
         while (ui->verticalLayout_8->count() > 0) {
             QLayoutItem* item = ui->verticalLayout_8->takeAt(0);
             if (item->widget()) item->widget()->deleteLater();
@@ -227,8 +319,9 @@ void Qt_main::creation_projet(){
         }
 
         ui->stackedWidget->setCurrentIndex(3);
+        affiche_element_liste();
         });
-    }
+}
 
 void Qt_main::affiche_element_liste() {
 
@@ -300,10 +393,11 @@ void Qt_main::affiche_element_liste() {
 
         // Nom + description
         QLabel* nom = new QLabel(data_element[i].nom, projet);
+        nom->setStyleSheet("font-size: 18pt; font-weight: 600;");
         zone_projet->addWidget(nom);
 
         QLabel* description = new QLabel(data_element[i].description, projet);
-        description->setStyleSheet("color: #A0A0A0; font-size: 9pt;");
+        description->setStyleSheet("color: #A0A0A0; font-size: 14pt;");
         zone_projet->addWidget(description);
 
         // Bouton modification
@@ -322,6 +416,7 @@ void Qt_main::affiche_element_liste() {
                 for (int k = 0; k < data_liste.size(); k++) {
 
                     if (data_liste[k].id == id_liste) {
+                        int id_liste_capture = data_liste[k].id;  // ← capture
 
                         QWidget* ligne = new QWidget(projet);
                         QHBoxLayout* layout = new QHBoxLayout(ligne);
@@ -331,7 +426,23 @@ void Qt_main::affiche_element_liste() {
                         layout->addWidget(validation);
 
                         QLabel* contenu = new QLabel(data_liste[k].contenu, ligne);
+                        if (data_liste[k].validation) {
+                            contenu->setStyleSheet("color: #606060; text-decoration: line-through;");
+                        }
+                        else {
+                            contenu->setStyleSheet("color: #F0F0F0;");
+                        }
                         layout->addWidget(contenu);
+
+                        connect(validation, &QCheckBox::toggled, this, [this, contenu, id_liste_capture](bool checked) {
+                            if (checked) {
+                                contenu->setStyleSheet("color: #606060; text-decoration: line-through;");
+                            }
+                            else {
+                                contenu->setStyleSheet("color: #F0F0F0;");
+                            }
+                            class_BDD.modif_liste(id_liste_capture, contenu->text(), checked);
+                            });
 
                         zone_projet->addWidget(ligne);
                     }
@@ -350,7 +461,7 @@ void Qt_main::affichage_modif_projet(int id_element, std::vector<BDD::LigneEleme
         {
             ui->stackedWidget->setCurrentIndex(5);
 
-            // 1) Nettoyer le layout avant d'ajouter
+            // 1) Nettoyer le layout
             while (ui->verticalLayout_12->count() > 0) {
                 QLayoutItem* item = ui->verticalLayout_12->takeAt(0);
                 if (item->widget())
@@ -358,7 +469,7 @@ void Qt_main::affichage_modif_projet(int id_element, std::vector<BDD::LigneEleme
                 delete item;
             }
 
-            // 2) Affichage des infos de l’élément
+            // 2) Affichage des infos de l'élément
             for (auto& e : data_element) {
                 if (e.id == id_element) {
                     ui->lineEdit_7->setText(e.nom);
@@ -369,81 +480,104 @@ void Qt_main::affichage_modif_projet(int id_element, std::vector<BDD::LigneEleme
 
             // 3) Création des lignes
             for (auto& c : data_contenue_liste) {
-                if (c.id_element != id_element)
-                    continue;
+                if (c.id_element != id_element) continue;
 
                 for (auto& l : data_liste) {
-                    if (l.id == c.id_liste) {
+                    if (l.id != c.id_liste) continue;
 
-                        table_id_liste_modif.push_back(l.id);
+                    table_id_liste_modif.push_back(l.id);
 
-                        QWidget* projet = new QWidget(this);
-                        QVBoxLayout* zone_projet = new QVBoxLayout(projet);
+                    QWidget* ligne = new QWidget(this);
+                    ligne->setMaximumHeight(120);
+                    QVBoxLayout* zone = new QVBoxLayout(ligne);
+                    zone->setContentsMargins(8, 8, 8, 8);
+                    zone->setSpacing(6);
 
-                        QWidget* ligneWidget = new QWidget(projet);
-                        QHBoxLayout* layout = new QHBoxLayout(ligneWidget);
-                        layout->setContentsMargins(0, 0, 0, 0);
+                    QWidget* rangee = new QWidget(ligne);
 
-                        QCheckBox* validation = new QCheckBox(ligneWidget);
-                        validation->setChecked(l.validation);
-                        validation->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-                        layout->addWidget(validation);
+                    QHBoxLayout* layoutRangee = new QHBoxLayout(rangee);
+                    layoutRangee->setContentsMargins(0, 0, 0, 0);
+                    layoutRangee->setSpacing(8);
 
-                        QLineEdit* contenu = new QLineEdit(l.contenu, ligneWidget);
-                        layout->addWidget(contenu); // prend tout l'espace
+                    QCheckBox* validation = new QCheckBox(rangee);
+                    validation->setChecked(l.validation);
 
-                        QPushButton* supp = new QPushButton("X", ligneWidget);
-                        supp->setObjectName("bouton_x");
-                        supp->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+                    QLineEdit* contenu = new QLineEdit(l.contenu, rangee);
+                    layoutRangee->addWidget(validation);
+                    layoutRangee->addWidget(contenu);
 
-                        zone_projet->addWidget(ligneWidget); // ← seulement ligneWidget ici
+                    QPushButton* supp = new QPushButton("X", ligne);
+                    supp->setFixedHeight(36);
+                    supp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-                        zone_projet->addWidget(supp);     // ← dans le layout horizontal !
-                        ui->verticalLayout_12->addWidget(projet);
+                    zone->addWidget(rangee);
+                    zone->addWidget(supp);
 
-                        connect(supp, &QPushButton::clicked, this, [projet]() {
-                            projet->deleteLater();
-                            });
-                    }
+                    ui->verticalLayout_12->addWidget(ligne);  // ← widget d'abord
+
+                    connect(supp, &QPushButton::clicked, this, [ligne]() {
+                        ligne->deleteLater();
+                        });
                 }
             }
 
-            // 4) Connecter UNE SEULE FOIS le bouton d’ajout
+            // ← addStretch UNE SEULE FOIS après la boucle
+            ui->verticalLayout_12->addStretch();
+
+            // 4) Bouton ajout
             ajout_liste_modif(id_element, data_contenue_liste);
 
-            // 5) Connecter UNE SEULE FOIS le bouton de modification
+            // 5) Bouton modification
             modif_projet(id_element, data_element, data_liste, data_contenue_liste);
         });
 }
 
-void Qt_main::ajout_liste_modif(int id_element, const std::vector<BDD::LigneContenueElement>data_contenue_liste){
+void Qt_main::ajout_liste_modif(int id_element, const std::vector<BDD::LigneContenueElement> data_contenue_liste) {
 
-    // Empêche les connexions multiples
     disconnect(ui->pushButton_12, nullptr, this, nullptr);
 
-    connect(ui->pushButton_12, &QPushButton::clicked, this, [this, id_element, data_contenue_liste](){
+    connect(ui->pushButton_12, &QPushButton::clicked, this, [this, id_element, data_contenue_liste]() {
 
-            QWidget* projet = new QWidget(this);
-            QVBoxLayout* zone_projet = new QVBoxLayout(projet);
+        // Retirer le stretch avant d'ajouter la nouvelle ligne
+        int last = ui->verticalLayout_12->count() - 1;
+        if (last >= 0) {
+            QLayoutItem* lastItem = ui->verticalLayout_12->itemAt(last);
+            if (lastItem && !lastItem->widget()) {
+                ui->verticalLayout_12->takeAt(last);
+                delete lastItem;
+            }
+        }
 
-            QWidget* ligneWidget = new QWidget(projet);
-            QHBoxLayout* layout = new QHBoxLayout(ligneWidget);
+        QWidget* ligne = new QWidget(this);
+        ligne->setMaximumHeight(120);
+        QVBoxLayout* zone = new QVBoxLayout(ligne);
+        zone->setContentsMargins(8, 8, 8, 8);
+        zone->setSpacing(6);
 
-            QCheckBox* validation = new QCheckBox(ligneWidget);
-            layout->addWidget(validation);
+        QWidget* rangee = new QWidget(ligne);
 
-            QLineEdit* contenu = new QLineEdit("", ligneWidget);
-            layout->addWidget(contenu);
+        QHBoxLayout* layoutRangee = new QHBoxLayout(rangee);
+        layoutRangee->setContentsMargins(0, 0, 0, 0);
+        layoutRangee->setSpacing(8);
 
-            QPushButton* supp = new QPushButton("X", ligneWidget);
-            layout->addWidget(supp);
+        QCheckBox* validation = new QCheckBox(rangee);
+        QLineEdit* contenu = new QLineEdit("", rangee);
+        layoutRangee->addWidget(validation);
+        layoutRangee->addWidget(contenu);
 
-            zone_projet->addWidget(ligneWidget);
-            ui->verticalLayout_12->addWidget(projet);
+        QPushButton* supp = new QPushButton("X", ligne);
+        supp->setFixedHeight(36);
+        supp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-            connect(supp, &QPushButton::clicked, this, [projet]() {
-                projet->deleteLater();
-                });
+        zone->addWidget(rangee);
+        zone->addWidget(supp);
+
+        ui->verticalLayout_12->addWidget(ligne);
+        ui->verticalLayout_12->addStretch();  // ← remet le stretch en dernier
+
+        connect(supp, &QPushButton::clicked, this, [ligne]() {
+            ligne->deleteLater();
+            });
         });
 }
 
@@ -563,6 +697,10 @@ void Qt_main::modif_projet(int id_element, std::vector<BDD::LigneElement> data_e
                 class_BDD.delete_contenu_liste(id_liste);
             }
         }
+
+        ui->stackedWidget->setCurrentIndex(3);
+        affiche_info_user();
+        affiche_element_liste();
     });
 
 }

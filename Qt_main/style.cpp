@@ -9,7 +9,7 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             background-color: #232323;
             color: #F0F0F0;
             font-family: "Segoe UI", "Arial", sans-serif;
-            font-size: 10pt;
+            font-size: 14pt;
         }
 
         /* ── Labels ─────────────────────────────────────────────────────────── */
@@ -20,21 +20,21 @@ void Style::appliquerStyle(QMainWindow* fenetre)
 
         QLabel#label_titre, QLabel#label_5 {
             color: #E67E22;
-            font-size: 38pt;
+            font-size: 28pt;
             font-weight: 700;
             letter-spacing: 4px;
         }
 
         QLabel#label_6 {
-            color: rgb(180, 180, 180);            
-            font-size: 11pt;
+            color: rgb(180, 180, 180);
+            font-size: 18pt;
             font-weight: 600;
         }
 
         QLabel#label,  QLabel#label_2,
         QLabel#label_3, QLabel#label_4 {
             color: #A0A0A0;
-            font-size: 8pt;
+            font-size: 12pt;
             font-weight: 600;
             letter-spacing: 1px;
         }
@@ -46,10 +46,10 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             border: none;
             border-bottom: 2px solid #3F3F3F;
             border-radius: 0px;
-            padding: 6px 4px;
+            padding: 8px 6px;
             selection-background-color: #E67E22;
             selection-color: #232323;
-            min-height: 28px;
+            min-height: 36px;
         }
 
         QLineEdit:focus {
@@ -68,11 +68,11 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             color: #E67E22;
             border: 2px solid #E67E22;
             border-radius: 4px;
-            padding: 10px 24px;
-            font-size: 10pt;
+            padding: 12px 28px;
+            font-size: 14pt;
             font-weight: 600;
             letter-spacing: 1px;
-            min-height: 20px;
+            min-height: 24px;
         }
 
         QPushButton#pushButton:hover,
@@ -98,11 +98,11 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             color: #E67E22;
             border: 2px solid #E67E22;
             border-radius: 4px;
-            padding: 10px 24px;
-            font-size: 10pt;
+            padding: 12px 28px;
+            font-size: 14pt;
             font-weight: 600;
             letter-spacing: 1px;
-            min-height: 40px;
+            min-height: 48px;
         }
 
         QPushButton#pushButton_3:hover,
@@ -133,9 +133,9 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             color: #A0A0A0;
             border: 2px solid #3F3F3F;
             border-radius: 4px;
-            padding: 10px 24px;
-            font-size: 10pt;
-            min-height: 40px;
+            padding: 12px 28px;
+            font-size: 14pt;
+            min-height: 48px;
         }
 
         QPushButton#pushButton_4:hover,
@@ -153,8 +153,8 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             color: #A0A0A0;
             border: 1px solid #3F3F3F;
             border-radius: 4px;
-            padding: 4px 14px;
-            font-size: 9pt;
+            font-size: 13pt;
+            padding: 10px 24px;
         }
 
         QPushButton#pushButton_7:hover {
@@ -170,8 +170,8 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             color: #E67E22;
             border: 1px dashed #E67E22;
             border-radius: 4px;
-            padding: 6px 16px;
-            font-size: 9pt;
+            padding: 8px 20px;
+            font-size: 13pt;
         }
 
         QPushButton#pushButton_11:hover,
@@ -179,16 +179,15 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             background-color: #3A3A3A;
         }
 
-
-
         /* ── Boutons dynamiques ──────────────────────────────────────────────── */
         QPushButton[text="Modification"] {
             background-color: transparent;
             color: #E67E22;
             border: 1px solid #E67E22;
             border-radius: 3px;
-            padding: 4px 10px;
-            font-size: 8pt;
+            padding: 5px 7px;
+            font-size: 14pt;
+            min-height: 44px;
         }
 
         QPushButton[text="Modification"]:hover {
@@ -201,8 +200,9 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             color: #A0A0A0;
             border: 1px solid #3F3F3F;
             border-radius: 3px;
-            padding: 4px 10px;
-            font-size: 8pt;
+            padding: 10px 14px;
+            font-size: 14pt;
+            min-height: 44px;
         }
 
         QPushButton[text="Suppression"]:hover {
@@ -215,9 +215,10 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             color: #606060;
             border: 1px solid #3F3F3F;
             border-radius: 3px;
-            padding: 2px 6px;
-            font-size: 9pt;
-            max-height: 28px;
+            font-size: 13pt;
+            min-height: 36px;
+            margin-top: 4px;
+
         }
 
         QPushButton[text="X"]:hover {
@@ -228,34 +229,44 @@ void Style::appliquerStyle(QMainWindow* fenetre)
         /* ── Cases à cocher ──────────────────────────────────────────────────── */
         QCheckBox {
             color: #F0F0F0;
-            spacing: 6px;
+            spacing: 8px;
             background-color: transparent;
         }
 
-        QCheckBox::indicator {
-            width: 16px;
-            height: 16px;
+        /* Règle universelle — couvre aussi les checkboxes créées dynamiquement */
+        QCheckBox::indicator,
+        QWidget QCheckBox::indicator {
+            width: 22px;
+            height: 22px;
             border: 2px solid #3F3F3F;
             border-radius: 3px;
             background-color: #2E2E2E;
+            image: none;
         }
 
-        QCheckBox::indicator:hover {
+        QCheckBox::indicator:hover,
+        QWidget QCheckBox::indicator:hover {
             border-color: #E67E22;
         }
 
-        QCheckBox::indicator:checked {
+        QCheckBox::indicator:checked,
+        QWidget QCheckBox::indicator:checked {
             background-color: #E67E22;
             border-color: #E67E22;
+            image: none;
+        }
+
+        QCheckBox::indicator:unchecked,
+        QWidget QCheckBox::indicator:unchecked {
+            background-color: #2E2E2E;
+            border-color: #3F3F3F;
+            image: none;
         }
 
         /* ── ScrollArea principale (page liste projets) ──────────────────────── */
-        /* Marges latérales pour rendu "colonne centrée façon mobile" */
         QScrollArea#scrollArea {
             background-color: #232323;
             border: none;
-            /*margin-left: 180px;
-            margin-right: 180px;*/
         }
 
         QScrollArea#scrollArea > QWidget > QWidget {

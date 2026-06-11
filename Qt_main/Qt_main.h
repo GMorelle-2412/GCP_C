@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QCheckBox>
 #include <vector>
+#include <QSettings>
 
 class Qt_main : public QMainWindow{
 

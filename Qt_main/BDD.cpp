@@ -38,30 +38,40 @@ void BDD::Connect_BDD() {
 }
 
 /*Users*/
-void BDD::Connection(const QString& nom, const QString& mdp) {
-
+bool BDD::Connection(const QString& nom, const QString& mdp) {
     QSqlQuery query;
     query.prepare("SELECT id FROM users WHERE nom = :nom AND mot_de_passe = :mdp");
-
     query.bindValue(":nom", nom);
     query.bindValue(":mdp", mdp);
-
     if (!query.exec()) {
         qDebug() << "Erreur SQL:" << query.lastError().text();
+        return false;
+    }
+    if (query.next()) {
+        id_user = query.value(0).toInt();
+        nom_user = nom;
+        qDebug() << "ID =" << id_user << "nom =" << nom_user;
+        return true; // ? connexion réussie
+    }
+    return false; // ? identifiants incorrects
+}
+
+void BDD::Connection_auto(const QString& nom) {
+    QSqlQuery query;
+    query.prepare("SELECT id FROM users WHERE nom = :nom");
+    query.bindValue(":nom", nom);
+    if (!query.exec()) {
+        qDebug() << "Erreur SQL Connection_auto:" << query.lastError().text();
         return;
     }
-
     if (query.next()) {
-        int id = query.value(0).toInt();
-
-        qDebug() << "ID =" << id;
-        qDebug() << "nom" << nom;
-
-        id_user = id;
-
+        id_user = query.value(0).toInt();
         nom_user = nom;
+        qDebug() << "Auto-login OK - ID =" << id_user << "nom =" << nom_user;
     }
-
+    else {
+        qDebug() << "Auto-login échoué : utilisateur introuvable";
+    }
 }
 
 void BDD::Inscription(const QString& nom, const QString& mdp){
@@ -114,7 +124,6 @@ void BDD::Suppression_User(){
     qDebug() << "Utilisateur supprimé avec succès";
     id_user = 0;
 }*/
-
 
 /*Liste*/
 int BDD::Poste_liste(const QString& contenu, bool validation)
