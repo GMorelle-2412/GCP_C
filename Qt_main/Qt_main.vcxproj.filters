@@ -46,6 +46,15 @@
     <ClCompile Include="style.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="identification.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="projet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="select.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BDD.h">
@@ -54,5 +63,16 @@
     <ClInclude Include="style.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="projet.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="identification.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="select.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
 </Project>

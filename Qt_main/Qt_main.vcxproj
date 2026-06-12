@@ -92,6 +92,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="identification.cpp" />
+    <ClCompile Include="projet.cpp" />
+    <ClCompile Include="select.cpp" />
     <ClCompile Include="style.cpp" />
     <QtRcc Include="Qt_main.qrc" />
     <QtUic Include="Qt_main.ui" />
@@ -102,6 +105,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BDD.h" />
+    <QtMoc Include="projet.h" />
+    <QtMoc Include="identification.h" />
+    <QtMoc Include="select.h" />
     <ClInclude Include="style.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
