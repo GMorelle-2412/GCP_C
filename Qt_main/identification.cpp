@@ -1,6 +1,5 @@
-#include "select.h"
 #include "identification.h"
-
+/*#include "select.h"
 
 void identification::page_connection() {
     connect(ui->pushButton_2, &QPushButton::clicked, this, [this]() {
@@ -95,4 +94,4 @@ void identification::bouton_deconection() {
         }
         ui->stackedWidget->setCurrentIndex(0);
         });
-}
+}*/

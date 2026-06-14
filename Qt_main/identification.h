@@ -1,23 +1,23 @@
 #pragma once
 
-#include "BDD.h"
+/*#include "BDD.h"
 #include "Style.h"
 #include "ui_Qt_main.h"
-#include "projet.h"
+#include "projet.h"*/
 
-#include <QObject>
+/*#include <QObject>
 #include <QPushButton>
-#include <QSettings>
+#include <QSettings>*/
 
 // Forward declarations pour éviter les boucles d'inclusion
-class projet;
-class select;
+//class projet;
+//class select;
 
-class identification : public QObject {
-    Q_OBJECT
+class identification /*: public QObject*/  {
+    //Q_OBJECT
 
 public:
-    explicit identification(QObject* parent = nullptr) : QObject(parent) {}
+    /*explicit identification(QObject* parent = nullptr) : QObject(parent) {}
 
     Ui::Qt_mainClass* ui;
 
@@ -30,5 +30,5 @@ public:
     void bouton_connection();
     void bouton_inscription();
     void affiche_info_user();
-    void bouton_deconection();
+    void bouton_deconection();*/
 };

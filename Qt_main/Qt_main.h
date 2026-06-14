@@ -5,13 +5,12 @@
 #include "identification.h"
 #include "projet.h"
 #include "Style.h"
+#include "select.h"
 
 #include <QScroller>
 #include <QEasingCurve>
 #include <QtWidgets/QMainWindow>
 
-// Forward declaration pour éviter la boucle d'inclusion
-class select;
 
 class Qt_main : public QMainWindow {
     Q_OBJECT
@@ -19,17 +18,16 @@ class Qt_main : public QMainWindow {
 public:
     Qt_main(QWidget* parent = nullptr);
     ~Qt_main();
-
+    
     Ui::Qt_mainClass* ui;
 
     BDD* class_BDD;
     identification* class_identification;
-    projet* class_projet;
     select* class_select;
-
-private:
-    int conteur_ajout_liste = 0;
+	Style* class_style;
 
 private slots:
+	void select_affichage_projets();
+
     void bouton_annulation();
 };

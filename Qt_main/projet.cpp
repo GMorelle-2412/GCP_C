@@ -1,5 +1,6 @@
 #include "projet.h"
 
+/*
 void projet::bouton_creation_projet() {
     connect(ui->pushButton_8, &QPushButton::clicked, this, [this]() {
         ui->stackedWidget->setCurrentIndex(4);
@@ -416,4 +417,4 @@ void projet::modif_projet(int id_element, std::vector<BDD::LigneElement> data_el
         ui->stackedWidget->setCurrentIndex(3);
         affiche_element_liste();
         });
-}
+}*/

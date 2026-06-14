@@ -1,5 +1,6 @@
 #pragma once
 
+/*
 #include "BDD.h"
 #include "Style.h"
 #include "ui_Qt_main.h"
@@ -7,13 +8,13 @@
 #include <QObject>
 #include <QPushButton>
 #include <vector>
-#include <QCheckBox>
+#include <QCheckBox>*/
 
-class projet : public QObject {
-    Q_OBJECT
+class projet /*: public QObject */{
+    //Q_OBJECT
 
 public:
-    explicit projet(QObject* parent = nullptr) : QObject(parent) {}
+    /*explicit projet(QObject* parent = nullptr) : QObject(parent) {}
 
     int verife_reste_liste = -1;
 
@@ -43,5 +44,5 @@ public:
     void modif_projet(int id_element,
         std::vector<BDD::LigneElement> data_element,
         std::vector<BDD::LigneListe> data_liste,
-        const std::vector<BDD::LigneContenueElement> data_contenue_liste);
+        const std::vector<BDD::LigneContenueElement> data_contenue_liste);*/
 };

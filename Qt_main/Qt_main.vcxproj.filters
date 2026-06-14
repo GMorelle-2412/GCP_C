@@ -29,9 +29,6 @@
     <QtUic Include="Qt_main.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtMoc Include="Qt_main.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <ClCompile Include="Qt_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -57,21 +54,24 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BDD.h">
+    <ClInclude Include="style.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="style.h">
+    <ClInclude Include="identification.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="projet.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="identification.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="select.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="Qt_main.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="BDD.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
