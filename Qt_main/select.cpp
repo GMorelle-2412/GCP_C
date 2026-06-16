@@ -133,7 +133,7 @@ void select::bouton_creation_projet_clicked(QPushButton* bouton_creation_projet,
         }
 
         for (int id_l : class_BDD->id_liste)
-            class_BDD->Poste_contenu_liste(class_BDD->id_element, id_l);
+            class_BDD->Poste_contenu(class_BDD->id_element, id_l, -1);
 
         while (verticalLayout_8->count() > 0) {
             QLayoutItem* item = verticalLayout_8->takeAt(0);
@@ -181,7 +181,7 @@ QWidget* select::bouton_liste_clicked(QPushButton* bouton_liste, QStackedWidget*
 
             // Récupération des données
             auto data_liste = class_BDD->Get_liste();
-            auto data_contenue = class_BDD->Get_contenu_liste();
+            auto data_contenue = class_BDD->Get_contenu();
 
             for (const auto& contenu : data_contenue) {
 
@@ -231,8 +231,7 @@ QWidget* select::bouton_liste_clicked(QPushButton* bouton_liste, QStackedWidget*
 }
 
 //Affichage de la page de modification du projet
-QWidget* select::bouton_modif_projet_clicked(QPushButton* bouton_modif_projet, QStackedWidget* stackedWidget, QLineEdit* nom, QLineEdit* description, QPushButton* bouton_ajouter, QVBoxLayout* verticalLayout
-    , QPushButton* bouton_modif) {
+QWidget* select::bouton_modif_projet_clicked(QPushButton* bouton_modif_projet, QStackedWidget* stackedWidget, QLineEdit* nom, QLineEdit* description, QPushButton* bouton_ajouter, QVBoxLayout* verticalLayout, QPushButton* bouton_modif) {
     
     bouton_modif_projet->disconnect();
     
@@ -253,7 +252,7 @@ QWidget* select::bouton_modif_projet_clicked(QPushButton* bouton_modif_projet, Q
 
         // Récupération des données
         auto data_liste = class_BDD->Get_liste();
-        auto data_contenue = class_BDD->Get_contenu_liste();
+        auto data_contenue = class_BDD->Get_contenu();
 
         for (const auto& contenu : data_contenue) {
 
@@ -434,7 +433,7 @@ void select::modif_projet(QPushButton* bouton_modif, QStackedWidget* stackedWidg
 
                 int id_liste = class_BDD->Poste_liste(contenu->text(), validation->isChecked());
 
-                class_BDD->Poste_contenu_liste(id_element, id_liste);
+                class_BDD->Poste_contenu(id_element, id_liste, -1);
             }
         }
 
@@ -452,7 +451,7 @@ void select::modif_projet(QPushButton* bouton_modif, QStackedWidget* stackedWidg
 
                 class_BDD->delete_liste(id_liste);
 
-                class_BDD->delete_contenu_liste(id_liste);
+                class_BDD->delete_contenu(id_liste);
             }
         }
 
@@ -462,3 +461,60 @@ void select::modif_projet(QPushButton* bouton_modif, QStackedWidget* stackedWidg
 }
 
 //QWidget* select::bouton_note_clicked(QPushButton* bouton_note, QStackedWidget* stackedWidget) {}
+
+
+/*Notes*/
+QWidget* select::affiche_note(QPushButton* bouton_affiche_note, QStackedWidget* stackedWidget) {
+    bouton_affiche_note->disconnect();
+
+    connect(bouton_affiche_note, &QPushButton::clicked, this, [=]() {
+        
+        auto data_element = class_BDD->Get_element();
+
+        for (int i = 0; i < data_element.size(); i++) {
+            auto data_contenue = class_BDD->Get_contenu();
+
+            for (int i = 0; i < data_contenue.size(); i++) {
+
+                if (data_contenue[i].id_element == sauvegarde.id) {
+                    qDebug() << data_contenue[i].id_note;
+                }
+            }
+        }
+
+        stackedWidget->setCurrentIndex(8);
+        });
+
+    return nullptr;
+}
+
+void select::zone_ajout_note (QPushButton* bouton_zone_ajout_note, QStackedWidget* stackedWidget) {
+    bouton_zone_ajout_note->disconnect();
+
+    connect(bouton_zone_ajout_note, &QPushButton::clicked, this, [=]() {
+
+        stackedWidget->setCurrentIndex(9);
+        });
+}
+
+void select::ajout_note(QStackedWidget* stackedWidget, QPushButton* bouton_ajout_note, QLineEdit* lineEdit_9, QTextEdit* textEdit) {
+
+    bouton_ajout_note->disconnect();
+
+    connect(bouton_ajout_note, &QPushButton::clicked, this, [=]() {
+
+        qDebug() << sauvegarde.nom;
+
+        qDebug() << sauvegarde.id;
+
+        QString text = lineEdit_9->text();
+
+        QString nom = textEdit->toPlainText();
+
+        id_notes = class_BDD->Poste_note(text, nom);
+
+        class_BDD->Poste_contenu(sauvegarde.id, -1, id_notes);
+
+        stackedWidget->setCurrentIndex(8);
+        });
+}

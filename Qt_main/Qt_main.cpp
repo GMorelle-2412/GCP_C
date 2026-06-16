@@ -10,20 +10,21 @@ Qt_main::Qt_main(QWidget* parent)
 {
     ui->setupUi(this);     
 
+
     class_BDD->Connect_BDD();
+
 
     ui->stackedWidget->setCurrentIndex(3);
 
+    
     select_affichage_projets();
+
 
     class_select->zone_creation_projet(ui->stackedWidget, ui->pushButton_8);
 
     class_select->ajouter_liste(ui->verticalLayout_8, ui->pushButton_11);
 
     class_select->bouton_creation_projet_clicked(ui->pushButton_10, ui->stackedWidget, ui->lineEdit_5, ui->lineEdit_6, ui->verticalLayout_8);
-
-
-
 
 
     bouton_annulation();
@@ -67,6 +68,13 @@ void Qt_main::select_affichage_projets() {
 
     QWidget* widgetListe = class_select->bouton_modif_projet_clicked(ui->pushButton_23, ui->stackedWidget, ui->lineEdit_7, ui->lineEdit_8, ui->pushButton_12, ui->verticalLayout_12, ui->pushButton_13);
 	ui->verticalLayout_12->addWidget(widgetListe);
+
+    QWidget* widgetNote = class_select->affiche_note(ui->pushButton_18, ui->stackedWidget);
+    ui->verticalLayout_20->addWidget(widgetNote);
+
+    class_select->zone_ajout_note(ui->pushButton_26, ui->stackedWidget);
+
+    class_select->ajout_note(ui->stackedWidget, ui->pushButton_28, ui->lineEdit_9, ui->textEdit);
 }
 
 void Qt_main::bouton_annulation() {    
@@ -93,6 +101,16 @@ void Qt_main::bouton_annulation() {
     connect(ui->pushButton_9, &QPushButton::clicked, this, [=]() {
         ui->stackedWidget->setCurrentIndex(3);
 		});
+
+    ui->pushButton_25->disconnect();
+    connect(ui->pushButton_25, &QPushButton::clicked, this, [=]() {
+        ui->stackedWidget->setCurrentIndex(6);
+        });
+
+    ui->pushButton_29->disconnect();
+    connect(ui->pushButton_29, &QPushButton::clicked, this, [=]() {
+        ui->stackedWidget->setCurrentIndex(8);
+        });
 }
 
 

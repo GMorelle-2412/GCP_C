@@ -21,9 +21,14 @@ public:
     ~BDD();
 
     int id_user = 3;
+
     QString nom_user = "nul";
+
     int id_element = 0;
+
     std::vector<int> id_liste;
+
+    int id_notes = 0;
 
     struct LigneListe {
         int id;
@@ -35,6 +40,13 @@ public:
         int id;
         int id_element;
         int id_liste;
+        int id_note;
+    };
+
+    struct Sauvegarde_Contenu_element_notes {
+        int id;
+        int id_element;
+        int id_notes;
     };
 
     struct LigneElement {
@@ -43,23 +55,48 @@ public:
         QString description;
     };
 
+    struct LigneNote {
+        int id;
+        QString text;
+        QString nom;
+    };
+
 public slots:
+    /*Connexion BDD*/
     void Connect_BDD();
 
+
+    /*Users*/
     void Connection(const QString& nom, const QString& mdp);
     void Connection_auto(const QString& nom);
     void Inscription(const QString& nom, const QString& mdp);
 
+
+    /*Element*/
     std::vector<LigneElement> Get_element();
     void Poste_element(const QString& nom, const QString& description);
-    void modif_element(int id, const QString& nom, const QString& description); // const QString&
+    void modif_element(int id, const QString& nom, const QString& description); 
 
+
+    /*Listes*/
     std::vector<LigneListe> Get_liste();
     int Poste_liste(const QString& contenu, bool validation);
-    void modif_liste(int id, const QString& contenu, bool validation);         // const QString&
+    void modif_liste(int id, const QString& contenu, bool validation);        
     void delete_liste(int id_liste);
 
-    std::vector<LigneContenueElement> Get_contenu_liste();
-    void Poste_contenu_liste(int id_element, int id_liste);
-    void delete_contenu_liste(int id_liste);
+
+    /*Contenu_element_listes*/
+    std::vector<LigneContenueElement> Get_contenu();
+    void Poste_contenu(int id_element, int id_liste, int id_notes);
+    void delete_contenu(int id_liste);
+
+
+    /*Contenu_element_notes*/
+    std::vector<Sauvegarde_Contenu_element_notes> Get_Contenu_element_notes();
+    int Poste_Contenu_element_notes(int id_element);
+
+
+    /*Notes*/
+    std::vector<LigneNote> Get_note(int id_note);
+    int Poste_note(const QString& text, const QString& nom);
 };

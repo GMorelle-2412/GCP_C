@@ -15,6 +15,7 @@
 #include <QScrollArea>
 #include <QCheckBox>
 #include <QLineEdit>
+#include <QTextEdit>
 
 class select : public QObject {
     Q_OBJECT
@@ -31,19 +32,27 @@ public:
 
     int verife_reste_liste = -1;
 
+    int id_notes = -1;
+
     std::vector<int> table_id_liste_modif;
 
 public slots:
+
+    /*zone principale*/
     QWidget* affichage_projets(const BDD::LigneElement& projet);
 
 	void zone_creation_projet(QStackedWidget* stackedWidget, QPushButton* bouton_modifier);
 
+
+    /*création projet*/
 	void ajouter_liste(QVBoxLayout* verticalLayout_8, QPushButton* bouton_ajouter);
 
 	void bouton_creation_projet_clicked(QPushButton* bouton_creation_projet, QStackedWidget* stackedWidget, QLineEdit* nom_cre, QLineEdit* description_cre, QVBoxLayout* verticalLayout_8);
 
     void bouton_ouvrir_clicked(const BDD::LigneElement& projet, QPushButton* bouton_modifier, QStackedWidget* stackedWidget);
-
+    
+    
+    /*Liste*/
     QWidget* bouton_liste_clicked(QPushButton* bouton_liste, QStackedWidget* stackedWidget);
 
 	QWidget* bouton_modif_projet_clicked(QPushButton* bouton_modif_projet, QStackedWidget* stackedWidget, QLineEdit* nom, QLineEdit* description, QPushButton* bouton_ajouter, QVBoxLayout* verticalLayout, QPushButton* bouton_modif);
@@ -53,4 +62,12 @@ public slots:
     void modif_projet(QPushButton* bouton_modif, QStackedWidget* stackedWidget, QLineEdit* nom, QLineEdit* description, QVBoxLayout* verticalLayout);
 
 	//QWidget* bouton_note_clicked(QPushButton* bouton_note, QStackedWidget* stackedWidget);
+
+
+    /*Notes*/
+    QWidget* affiche_note(QPushButton* bouton_affiche_note, QStackedWidget* stackedWidget);
+
+    void zone_ajout_note(QPushButton* bouton_zone_ajout_note, QStackedWidget* stackedWidget);
+
+    void ajout_note(QStackedWidget* stackedWidget, QPushButton* bouton_ajout_note, QLineEdit* lineEdit_9, QTextEdit* textEdit);
 };
