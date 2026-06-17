@@ -21,6 +21,8 @@ class select : public QObject {
     Q_OBJECT
 
 public:
+    explicit select(QObject* parent = nullptr);
+
     BDD* class_BDD;
 
     struct sauvegarde_element {
@@ -35,6 +37,9 @@ public:
     int id_notes = -1;
 
     std::vector<int> table_id_liste_modif;
+
+    QWidget* sauve_modif_notes;
+    QVBoxLayout* layout_sauve_modif_notes;
 
 public slots:
 
@@ -65,9 +70,11 @@ public slots:
 
 
     /*Notes*/
-    QWidget* affiche_note(QPushButton* bouton_affiche_note, QStackedWidget* stackedWidget);
+    QWidget* affiche_note(QPushButton* bouton_affiche_note, QStackedWidget* stackedWidget, QVBoxLayout* verticalLayout);
 
     void zone_ajout_note(QPushButton* bouton_zone_ajout_note, QStackedWidget* stackedWidget);
 
     void ajout_note(QStackedWidget* stackedWidget, QPushButton* bouton_ajout_note, QLineEdit* lineEdit_9, QTextEdit* textEdit);
+
+    void affiche_modif_note(QStackedWidget* stackedWidget, QPushButton* bouton_modif_note, int notes, QLabel *nom, QLabel *text, QVBoxLayout* verticalLayout);
 };

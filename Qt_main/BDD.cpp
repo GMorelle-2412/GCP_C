@@ -148,15 +148,14 @@ void BDD::delete_liste(int id_liste)
 }
 
 
-/*Contenu*/
+/*Contenu_element_listes*/
 std::vector<BDD::LigneContenueElement> BDD::Get_contenu() {
 
     std::vector<LigneContenueElement> resultat;
 
-    if (id_element == -1) {
         for (const LigneListe& item : Get_liste()) {
             QSqlQuery query(QSqlDatabase::database());
-            query.prepare("SELECT * FROM contenu WHERE id_liste = :id_liste");
+            query.prepare("SELECT * FROM contenu_element_listes WHERE id_liste = :id_liste");
             query.bindValue(":id_liste", item.id);
 
             if (!query.exec()) {
@@ -172,54 +171,21 @@ std::vector<BDD::LigneContenueElement> BDD::Get_contenu() {
                 resultat.push_back(ligne);
             }
         }
-    }
-    else {
-        QSqlQuery query(QSqlDatabase::database());
-        query.prepare("SELECT * FROM contenu WHERE id_liste = :id_liste");
-        query.bindValue(":id_liste", id_element);
-
-        if (!query.exec()) {
-            qDebug() << "Erreur SQL Get_contenu:" << query.lastError().text();
-        }
-
-        while (query.next()) {
-            LigneContenueElement ligne;
-            ligne.id = query.value("id").toInt();
-            ligne.id_element = query.value("id_element").toInt();
-            ligne.id_liste = query.value("id_liste").toInt();
-            ligne.id_note = query.value("id_notes").toInt();
-            resultat.push_back(ligne);
-        }
-    }
-
     
-
     return resultat;
 }
 
-void BDD::Poste_contenu(int id_element, int id_liste, int id_notes){
+void BDD::Poste_contenu(int id_element, int id_liste){
 
     QSqlQuery query(QSqlDatabase::database());
 
-    if (id_notes == -1) {
-        
-        query.prepare("INSERT INTO contenu (id_element, id_liste) VALUES (:id_element, :id_liste)");
-        query.bindValue(":id_element", id_element);
-        query.bindValue(":id_liste", id_liste);
+    query.prepare("INSERT INTO contenu (id_element, id_liste) VALUES (:id_element, :id_liste)");
+    query.bindValue(":id_element", id_element);
+    query.bindValue(":id_liste", id_liste);
 
-        if (!query.exec())
-            qDebug() << "Erreur SQL Poste_contenu:" << query.lastError().text();
-    }
-    else {
-
-        query.prepare("INSERT INTO contenu (id_notes, id_liste, id_element) VALUES (:id_notes, :id_liste, :id_element)");
-        query.bindValue(":id_notes", id_notes);
-        query.bindValue(":id_liste", id_liste);
-        query.bindValue(":id_element", id_element);
-
-        if (!query.exec())
-            qDebug() << "Erreur SQL Poste_contenu:" << query.lastError().text();
-    }
+    if (!query.exec())qDebug() << "Erreur SQL Poste_contenu:" << query.lastError().text();
+    
+    return;
 }
 
 void BDD::delete_contenu(int id_liste)
@@ -233,12 +199,71 @@ void BDD::delete_contenu(int id_liste)
 }
 
 
+/*Contenu_element_notes*/
+std::vector<BDD::Sauvegarde_Contenu_element_notes> BDD::Get_Contenu_element_notes(int id_element) {
+    
+    std::vector<BDD::Sauvegarde_Contenu_element_notes> sauvegarde;
+
+
+        QSqlQuery query(QSqlDatabase::database());
+        query.prepare("SELECT * FROM contenu_element_notes WHERE id_element = :id_element");
+        query.bindValue(":id_element", id_element);
+
+        if (!query.exec()) {
+            qDebug() << "Erreur SQL Get_contenu:" << query.lastError().text();
+            return sauvegarde;
+        }
+
+        while (query.next()) {
+            Sauvegarde_Contenu_element_notes ligne;
+
+            ligne.id = query.value("id").toInt();
+            ligne.id_element = query.value("id_element").toInt();
+            ligne.id_notes = query.value("id_notes").toInt();
+
+            sauvegarde.push_back(ligne);
+        }
+    
+    return sauvegarde;
+}
+
+int BDD::Poste_Contenu_element_notes(int id_element, int id_notes) {
+    QSqlQuery query(QSqlDatabase::database());
+
+    query.prepare("INSERT INTO contenu_element_notes (id_element, id_notes) VALUES (:id_element, :id_notes)");
+
+    query.bindValue(":id_element", id_element);
+    query.bindValue(":id_notes", id_notes);
+
+    if (!query.exec()) {
+        qDebug() << "Erreur SQL Poste_liste:" << query.lastError().text();
+        return -1;
+    }
+}
+
+int BDD::modif_note(int id_note, const QString& nom, const QString& texte) {
+    
+    QSqlQuery query;
+    query.prepare("UPDATE notes SET nom = :nom, text = :text WHERE id = :id");
+    query.bindValue(":nom", nom);
+    query.bindValue(":text", texte);
+    query.bindValue(":id", id_note);
+
+    if (!query.exec()) {
+        qDebug() << "Erreur modif_note:" << query.lastError().text();
+        return -1;
+    }
+
+    return 0;
+}
+
+
 /*Element*/
 std::vector<BDD::LigneElement> BDD::Get_element() {
 
     std::vector<LigneElement> resultat;
 
-    for (const LigneContenueElement& item : Get_contenu(-1)) {
+    for (const LigneContenueElement& item : Get_contenu()) {
         QSqlQuery query(QSqlDatabase::database());
         query.prepare("SELECT id, nom, description FROM element WHERE id = :id");
         query.bindValue(":id", item.id_element);
@@ -297,6 +322,11 @@ std::vector<BDD::LigneNote> BDD::Get_note(int id_note) {
     query.prepare("SELECT * FROM notes WHERE id = :id");
 
     query.bindValue(":id", id_note);
+
+    if (!query.exec()) {
+        qDebug() << "Erreur SQL Get_element:" << query.lastError().text();
+        return Note;
+    }
 
     if (query.next()) {
         LigneNote note_info;

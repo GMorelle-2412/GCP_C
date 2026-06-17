@@ -1,4 +1,11 @@
-#include "select.h"
+ï»¿#include "select.h"
+
+select::select(QObject* parent)
+    : QObject(parent)
+{
+    sauve_modif_notes = new QWidget();
+    layout_sauve_modif_notes = new QVBoxLayout(sauve_modif_notes);
+}
 
 /*zone principale*/
 QWidget* select::affichage_projets(const BDD::LigneElement& projet) {
@@ -20,11 +27,20 @@ QWidget* select::affichage_projets(const BDD::LigneElement& projet) {
 
     QHBoxLayout* zone_etat = new QHBoxLayout;
 
+    QLabel* imageLabel = new QLabel();
+    imageLabel->setPixmap(QPixmap(":/complÃ©tion/image/PlayStation 4 PlayStation 3 Trophy Video Game Xbox One PNG.jfif"));
+    imageLabel->setScaledContents(true);
+
+    zone_etat->addWidget(imageLabel);
+
+
     QLabel* pourcentage_de_completion = new QLabel("0 %");
     zone_etat->addWidget(pourcentage_de_completion);
 
     layout_principal->addLayout(zone_titre_description);
     layout_principal->addLayout(zone_etat);
+
+    projetWidget->setObjectName("zoneProjets");
 
     return projetWidget;
 }
@@ -35,7 +51,7 @@ void select::bouton_ouvrir_clicked(const BDD::LigneElement& projet, QPushButton*
 
     connect(bouton_modifier, &QPushButton::clicked, this, [=]() {
 
-        qDebug() << "Bouton 'ouvrir' cliqué pour le projet :" << projet.nom;
+        qDebug() << "Bouton 'ouvrir' cliquÃ© pour le projet :" << projet.nom;
 
         // SAUVEGARDE DANS LA VARIABLE MEMBRE
         sauvegarde.id = projet.id;
@@ -47,7 +63,7 @@ void select::bouton_ouvrir_clicked(const BDD::LigneElement& projet, QPushButton*
 }
 
 
-/*création projet*/
+/*crÃ©ation projet*/
 void select::zone_creation_projet(QStackedWidget* stackedWidget, QPushButton* bouton_modifier){
     bouton_modifier->disconnect();
     
@@ -133,7 +149,7 @@ void select::bouton_creation_projet_clicked(QPushButton* bouton_creation_projet,
         }
 
         for (int id_l : class_BDD->id_liste)
-            class_BDD->Poste_contenu(class_BDD->id_element, id_l, -1);
+            class_BDD->Poste_contenu(class_BDD->id_element, id_l);
 
         while (verticalLayout_8->count() > 0) {
             QLayoutItem* item = verticalLayout_8->takeAt(0);
@@ -163,7 +179,7 @@ QWidget* select::bouton_liste_clicked(QPushButton* bouton_liste, QStackedWidget*
     connect(bouton_liste, &QPushButton::clicked, this,
         [=]() {
 
-            qDebug() << "Bouton 'liste' cliqué pour le projet :" << sauvegarde.nom;
+            qDebug() << "Bouton 'liste' cliquÃ© pour le projet :" << sauvegarde.nom;
 
             // Nettoyage si on reclique plusieurs fois
             QLayoutItem* item;
@@ -179,7 +195,7 @@ QWidget* select::bouton_liste_clicked(QPushButton* bouton_liste, QStackedWidget*
             QLabel* description = new QLabel(sauvegarde.description);
             layout_principal->addWidget(description);
 
-            // Récupération des données
+            // RÃ©cupÃ©ration des donnÃ©es
             auto data_liste = class_BDD->Get_liste();
             auto data_contenue = class_BDD->Get_contenu();
 
@@ -250,7 +266,7 @@ QWidget* select::bouton_modif_projet_clicked(QPushButton* bouton_modif_projet, Q
             delete item;
         }
 
-        // Récupération des données
+        // RÃ©cupÃ©ration des donnÃ©es
         auto data_liste = class_BDD->Get_liste();
         auto data_contenue = class_BDD->Get_contenu();
 
@@ -433,7 +449,7 @@ void select::modif_projet(QPushButton* bouton_modif, QStackedWidget* stackedWidg
 
                 int id_liste = class_BDD->Poste_liste(contenu->text(), validation->isChecked());
 
-                class_BDD->Poste_contenu(id_element, id_liste, -1);
+                class_BDD->Poste_contenu(id_element, id_liste);
             }
         }
 
@@ -464,31 +480,54 @@ void select::modif_projet(QPushButton* bouton_modif, QStackedWidget* stackedWidg
 
 
 /*Notes*/
-QWidget* select::affiche_note(QPushButton* bouton_affiche_note, QStackedWidget* stackedWidget) {
+QWidget* select::affiche_note(QPushButton* bouton_affiche_note, QStackedWidget* stackedWidget, QVBoxLayout* verticalLayout) {
+
     bouton_affiche_note->disconnect();
 
+    QWidget* note = new QWidget();
+    QVBoxLayout* layout_principal = new QVBoxLayout(note);
+
     connect(bouton_affiche_note, &QPushButton::clicked, this, [=]() {
-        
-        auto data_element = class_BDD->Get_element();
 
-        for (int i = 0; i < data_element.size(); i++) {
-            auto data_contenue = class_BDD->Get_contenu();
+        // Nettoyage du layout
+        QLayoutItem* item;
+        while ((item = layout_principal->takeAt(0)) != nullptr) {
+            if (item->widget())
+                delete item->widget();
+            if (item->layout())
+                delete item->layout();
+            delete item;
+        }
 
-            for (int i = 0; i < data_contenue.size(); i++) {
+        auto data_contenue_note = class_BDD->Get_Contenu_element_notes(sauvegarde.id);
 
-                if (data_contenue[i].id_element == sauvegarde.id) {
-                    qDebug() << data_contenue[i].id_note;
-                }
+        for (const auto& contenu : data_contenue_note) {
+
+            auto data_note = class_BDD->Get_note(contenu.id_notes);
+
+            for (const auto& noteData : data_note) {
+
+                QLabel* nom = new QLabel(noteData.nom);
+                layout_principal->addWidget(nom);
+
+                QLabel* text = new QLabel(noteData.text);
+                text->setWordWrap(true);
+                layout_principal->addWidget(text);
+
+                QPushButton* modif = new QPushButton("Modification");
+                layout_principal->addWidget(modif);
+
+                affiche_modif_note(stackedWidget, modif, contenu.id_notes, nom, text, verticalLayout);
             }
         }
 
         stackedWidget->setCurrentIndex(8);
         });
 
-    return nullptr;
+    return note;
 }
 
-void select::zone_ajout_note (QPushButton* bouton_zone_ajout_note, QStackedWidget* stackedWidget) {
+void select::zone_ajout_note(QPushButton* bouton_zone_ajout_note, QStackedWidget* stackedWidget) {
     bouton_zone_ajout_note->disconnect();
 
     connect(bouton_zone_ajout_note, &QPushButton::clicked, this, [=]() {
@@ -507,14 +546,51 @@ void select::ajout_note(QStackedWidget* stackedWidget, QPushButton* bouton_ajout
 
         qDebug() << sauvegarde.id;
 
-        QString text = lineEdit_9->text();
+        QString text = textEdit->toPlainText();
 
-        QString nom = textEdit->toPlainText();
+        QString nom = lineEdit_9->text(); 
 
         id_notes = class_BDD->Poste_note(text, nom);
 
-        class_BDD->Poste_contenu(sauvegarde.id, -1, id_notes);
+        class_BDD->Poste_Contenu_element_notes(sauvegarde.id, id_notes);
 
         stackedWidget->setCurrentIndex(8);
+        });
+}
+
+void select::affiche_modif_note(QStackedWidget* stackedWidget, QPushButton* bouton_modif_note, int id_note, QLabel* nom, QLabel* text, QVBoxLayout* verticalLayout) {
+
+    bouton_modif_note->disconnect();
+
+    connect(bouton_modif_note, &QPushButton::clicked, this, [=]() {
+
+        // ðŸ”¥ Nettoyage du layout
+        QLayoutItem* item;
+        while ((item = layout_sauve_modif_notes->takeAt(0)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+
+        // ðŸ”¥ Remplissage
+        QLineEdit* editNom = new QLineEdit(nom->text());
+        layout_sauve_modif_notes->addWidget(editNom);
+
+        QTextEdit* editText = new QTextEdit(text->text());
+        layout_sauve_modif_notes->addWidget(editText);
+
+        QPushButton* save = new QPushButton("Enregistrer");
+        layout_sauve_modif_notes->addWidget(save);
+
+        connect(save, &QPushButton::clicked, this, [=]() {
+
+            class_BDD->modif_note(id_note, editNom->text(), editText->toPlainText());
+
+            nom->setText(editNom->text());
+            text->setText(editText->toPlainText());
+
+            stackedWidget->setCurrentIndex(8);
+            });
+
+        stackedWidget->setCurrentIndex(10);
         });
 }
