@@ -5,4 +5,7 @@
     <qresource prefix="/BDD">
         <file>BDD.db</file>
     </qresource>
+    <qresource prefix="/complétion">
+        <file>image/PlayStation 4 PlayStation 3 Trophy Video Game Xbox One PNG.jfif</file>
+    </qresource>
 </RCC>
