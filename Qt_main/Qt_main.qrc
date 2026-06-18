@@ -6,6 +6,10 @@
         <file>BDD.db</file>
     </qresource>
     <qresource prefix="/complétion">
-        <file>image/PlayStation 4 PlayStation 3 Trophy Video Game Xbox One PNG.jfif</file>
+        <file>image/platine.png</file>
+        <file>image/or.png</file>
+        <file>image/fer.png</file>
+        <file>image/bronze.png</file>
+        <file>image/noir.png</file>
     </qresource>
 </RCC>

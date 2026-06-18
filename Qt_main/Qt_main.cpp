@@ -27,6 +27,11 @@ Qt_main::Qt_main(QWidget* parent)
 
     class_select->bouton_creation_projet_clicked(ui->pushButton_10, ui->stackedWidget, ui->lineEdit_5, ui->lineEdit_6, ui->verticalLayout_8);
 
+    ui->label_17->setPixmap(QPixmap(":/complétion/image/platine.png"));
+    ui->label_17->setFixedSize(50, 50);
+    ui->label_17->setScaledContents(true);
+
+    ui->label_18->setText(QString::number(class_select->nb_projet_platine) + " / " + QString::number(class_select->nb_projet));
 
     bouton_annulation();
 }
@@ -46,12 +51,15 @@ void Qt_main::select_affichage_projets() {
         tab_id_element.push_back(element.id);
 
         QWidget* widgetProjet = class_select->affichage_projets(element);
+        ui->verticalLayout_9->setSpacing(75);
         ui->verticalLayout_9->addWidget(widgetProjet);
 
         QPushButton* bouton_modifier = widgetProjet->findChild<QPushButton*>("bouton_modifier");
 
         if (bouton_modifier)
             class_select->bouton_ouvrir_clicked(element, bouton_modifier, ui->stackedWidget);
+
+        class_select->nb_projet++;
     }
 
     // --- WIDGETS UNIQUES (hors boucle) ---
@@ -67,6 +75,7 @@ void Qt_main::select_affichage_projets() {
     ui->verticalLayout_12->addWidget(widgetModif);
 
     QWidget* widgetNote = class_select->affiche_note(ui->pushButton_18, ui->stackedWidget, ui->verticalLayout_25);
+    ui->verticalLayout_20->setSpacing(75);
     ui->verticalLayout_20->addWidget(widgetNote);
 
     class_select->zone_ajout_note(ui->pushButton_26, ui->stackedWidget);

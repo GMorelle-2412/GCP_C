@@ -96,6 +96,7 @@ public slots:
     int Poste_Contenu_element_notes(int id_element, int id_notes);
     int modif_note(int id_note, const QString& nom, const QString& texte);
 
+
     /*Notes*/
     std::vector<LigneNote> Get_note(int id_note);
     int Poste_note(const QString& text, const QString& nom);

@@ -41,6 +41,12 @@ public:
     QWidget* sauve_modif_notes;
     QVBoxLayout* layout_sauve_modif_notes;
 
+    int sauvegarde_nb_liste_valider = 0;    
+    int sauvegarde_nb_liste_max = 0;
+
+    int nb_projet = 0;
+    int nb_projet_platine = 0;
+
 public slots:
 
     /*zone principale*/

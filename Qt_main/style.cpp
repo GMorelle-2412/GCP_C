@@ -24,6 +24,12 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             background-color: transparent;
         }
 
+        #titre {
+            color: #E67E22;
+            background-color: transparent;
+            font-size: 25pt;
+        }
+
         /* Titre principal (page d'accueil uniquement) */
         QLabel#label_titre {
             color: #E67E22;
@@ -310,12 +316,11 @@ void Style::appliquerStyle(QMainWindow* fenetre)
         }
 
         #zoneProjets {
-            background-color: #232323;
+            background-color: #2E2E2E;
             border-bottom: 2px solid #444;
             border-left: 2px solid #E67E22;
-            padding: 10px;
+            padding: 50px;
         }
-
 
         /* ── Scrollbars ──────────────────────────────────────────────────────── */
         QScrollBar:vertical {

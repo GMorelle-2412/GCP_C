@@ -7,8 +7,37 @@ select::select(QObject* parent)
     layout_sauve_modif_notes = new QVBoxLayout(sauve_modif_notes);
 }
 
+
 /*zone principale*/
 QWidget* select::affichage_projets(const BDD::LigneElement& projet) {
+    
+    /*Recherche */
+    auto data_liste = class_BDD->Get_liste();
+    auto data_contenue = class_BDD->Get_contenu();
+
+    for (int i = 0; i < data_contenue.size(); i++) {
+
+        for (int j = 0; j < data_liste.size(); j++) {
+
+            if (data_contenue[i].id_element == projet.id) {
+
+                if (data_contenue[i].id_liste == data_liste[j].id) {
+
+                    sauvegarde_nb_liste_max++;
+
+                    if (data_liste[j].validation == 1) {
+
+                        sauvegarde_nb_liste_valider++;
+                    }
+                }
+            }  
+        }
+    }
+
+    int pourcentage = 0;
+    if (sauvegarde_nb_liste_max > 0) {
+        pourcentage = (sauvegarde_nb_liste_valider * 100) / sauvegarde_nb_liste_max;
+    }
 
     QWidget* projetWidget = new QWidget();
     QVBoxLayout* layout_principal = new QVBoxLayout(projetWidget);
@@ -16,31 +45,55 @@ QWidget* select::affichage_projets(const BDD::LigneElement& projet) {
     QVBoxLayout* zone_titre_description = new QVBoxLayout;
 
     QLabel* titre = new QLabel(projet.nom);
+    titre->setObjectName("titre");
     zone_titre_description->addWidget(titre);
 
     QLabel* description = new QLabel(projet.description);
     zone_titre_description->addWidget(description);
 
-	QPushButton* bouton_modifier = new QPushButton("ouvrire");
-	bouton_modifier->setObjectName("bouton_modifier");
-	zone_titre_description->addWidget(bouton_modifier);
+    QPushButton* bouton_modifier = new QPushButton("ouvrir");
+    bouton_modifier->setObjectName("bouton_modifier");
+    zone_titre_description->addWidget(bouton_modifier);
 
     QHBoxLayout* zone_etat = new QHBoxLayout;
 
-    QLabel* imageLabel = new QLabel();
-    imageLabel->setPixmap(QPixmap(":/complétion/image/PlayStation 4 PlayStation 3 Trophy Video Game Xbox One PNG.jfif"));
-    imageLabel->setScaledContents(true);
+    QWidget* planing = new QWidget();
+    zone_etat->addWidget(planing);
 
+    QLabel* imageLabel = new QLabel();
+
+    if (pourcentage == 100) {
+        imageLabel->setPixmap(QPixmap(":/complétion/image/platine.png"));
+        nb_projet_platine++;
+    }
+    else if(pourcentage >= 75){
+        imageLabel->setPixmap(QPixmap(":/complétion/image/or.png"));
+    }
+    else if (pourcentage >= 50) {
+        imageLabel->setPixmap(QPixmap(":/complétion/image/fer.png"));
+    }
+    else if (pourcentage < 50 && pourcentage != 0) {
+        imageLabel->setPixmap(QPixmap(":/complétion/image/bronze.png"));
+    }
+    else if (pourcentage == 0){
+        imageLabel->setPixmap(QPixmap(":/complétion/image/noir.png"));
+    }
+
+    imageLabel->setFixedSize(100, 100);
+    imageLabel->setScaledContents(true);
     zone_etat->addWidget(imageLabel);
 
-
-    QLabel* pourcentage_de_completion = new QLabel("0 %");
+    QLabel* pourcentage_de_completion =
+        new QLabel(QString::number(pourcentage) + " %");
     zone_etat->addWidget(pourcentage_de_completion);
 
     layout_principal->addLayout(zone_titre_description);
     layout_principal->addLayout(zone_etat);
 
     projetWidget->setObjectName("zoneProjets");
+
+    sauvegarde_nb_liste_max = 0;
+    sauvegarde_nb_liste_valider = 0;
 
     return projetWidget;
 }
@@ -480,8 +533,10 @@ void select::modif_projet(QPushButton* bouton_modif, QStackedWidget* stackedWidg
 
 
 /*Notes*/
-QWidget* select::affiche_note(QPushButton* bouton_affiche_note, QStackedWidget* stackedWidget, QVBoxLayout* verticalLayout) {
-
+QWidget* select::affiche_note(QPushButton* bouton_affiche_note,
+    QStackedWidget* stackedWidget,
+    QVBoxLayout* verticalLayout)
+{
     bouton_affiche_note->disconnect();
 
     QWidget* note = new QWidget();
@@ -489,13 +544,11 @@ QWidget* select::affiche_note(QPushButton* bouton_affiche_note, QStackedWidget* 
 
     connect(bouton_affiche_note, &QPushButton::clicked, this, [=]() {
 
-        // Nettoyage du layout
+        // Nettoyage du layout principal
         QLayoutItem* item;
         while ((item = layout_principal->takeAt(0)) != nullptr) {
             if (item->widget())
                 delete item->widget();
-            if (item->layout())
-                delete item->layout();
             delete item;
         }
 
@@ -507,16 +560,28 @@ QWidget* select::affiche_note(QPushButton* bouton_affiche_note, QStackedWidget* 
 
             for (const auto& noteData : data_note) {
 
+                // 🔥 NOUVELLE ZONE POUR CHAQUE NOTE
+                QWidget* zone_note = new QWidget();
+                zone_note->setObjectName("zoneProjets");
+
+                QVBoxLayout* layout_zone_note = new QVBoxLayout(zone_note);
+
                 QLabel* nom = new QLabel(noteData.nom);
-                layout_principal->addWidget(nom);
+                nom->setObjectName("titre");
+                layout_zone_note->addWidget(nom);
 
                 QLabel* text = new QLabel(noteData.text);
                 text->setWordWrap(true);
-                layout_principal->addWidget(text);
+                layout_zone_note->addWidget(text);
 
                 QPushButton* modif = new QPushButton("Modification");
-                layout_principal->addWidget(modif);
+                modif->setObjectName("bouton_modifier");
+                layout_zone_note->addWidget(modif);
 
+                // Ajout de la zone au layout principal
+                layout_principal->addWidget(zone_note);
+
+                // Connexion modification
                 affiche_modif_note(stackedWidget, modif, contenu.id_notes, nom, text, verticalLayout);
             }
         }
@@ -524,6 +589,7 @@ QWidget* select::affiche_note(QPushButton* bouton_affiche_note, QStackedWidget* 
         stackedWidget->setCurrentIndex(8);
         });
 
+    
     return note;
 }
 

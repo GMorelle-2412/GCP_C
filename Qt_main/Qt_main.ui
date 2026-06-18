@@ -23,7 +23,7 @@
     <item row="0" column="1">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>8</number>
       </property>
       <widget class="QWidget" name="page_index">
        <property name="styleSheet">
@@ -383,7 +383,7 @@ QPushButton:hover {
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,5,0">
+           <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0,0">
             <property name="sizeConstraint">
              <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
             </property>
@@ -395,28 +395,18 @@ QPushButton:hover {
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_6">
-              <property name="styleSheet">
-               <string notr="true">#label6{
-	
-	color: rgb(180, 180, 180);
-}</string>
-              </property>
+             <widget class="QLabel" name="label_17">
               <property name="text">
                <string>TextLabel</string>
               </property>
              </widget>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_13">
-              <item>
-               <widget class="QPushButton" name="pushButton_7">
-                <property name="text">
-                 <string>Déconnection</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <widget class="QLabel" name="label_18">
+              <property name="text">
+               <string>TextLabel</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -431,7 +421,7 @@ QPushButton:hover {
                <x>0</x>
                <y>0</y>
                <width>436</width>
-               <height>433</height>
+               <height>443</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_10">
@@ -633,44 +623,6 @@ QPushButton:hover {
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_15">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,5,0">
-            <property name="sizeConstraint">
-             <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
-            </property>
-            <item>
-             <widget class="QLabel" name="label_7">
-              <property name="text">
-               <string>GCP</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_8">
-              <property name="styleSheet">
-               <string notr="true">#label6{
-	
-	color: rgb(180, 180, 180);
-}</string>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_14">
-              <item>
-               <widget class="QPushButton" name="pushButton_15">
-                <property name="text">
-                 <string>Déconnection</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-          <item>
            <widget class="QScrollArea" name="scrollArea_4">
             <property name="widgetResizable">
              <bool>true</bool>
@@ -681,7 +633,7 @@ QPushButton:hover {
                <x>0</x>
                <y>0</y>
                <width>436</width>
-               <height>433</height>
+               <height>467</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_14">
@@ -748,44 +700,6 @@ QPushButton:hover {
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_19">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,1,0">
-            <property name="sizeConstraint">
-             <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
-            </property>
-            <item>
-             <widget class="QLabel" name="label_9">
-              <property name="text">
-               <string>GCP</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_10">
-              <property name="styleSheet">
-               <string notr="true">#label6{
-	
-	color: rgb(180, 180, 180);
-}</string>
-              </property>
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_18">
-              <item>
-               <widget class="QPushButton" name="pushButton_17">
-                <property name="text">
-                 <string>Déconnection</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-          <item>
            <widget class="QScrollArea" name="scrollArea_5">
             <property name="widgetResizable">
              <bool>true</bool>
@@ -796,7 +710,7 @@ QPushButton:hover {
                <x>0</x>
                <y>0</y>
                <width>436</width>
-               <height>403</height>
+               <height>437</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_16">
@@ -830,31 +744,6 @@ QPushButton:hover {
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_17">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="0,1,0">
-            <item>
-             <widget class="QLabel" name="label_12">
-              <property name="text">
-               <string>GCP</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_11">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_24">
-              <property name="text">
-               <string>Déconnection</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
            <widget class="QScrollArea" name="scrollArea_6">
             <property name="widgetResizable">
              <bool>true</bool>
@@ -865,7 +754,7 @@ QPushButton:hover {
                <x>0</x>
                <y>0</y>
                <width>436</width>
-               <height>405</height>
+               <height>437</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_17">
@@ -896,33 +785,22 @@ QPushButton:hover {
       </widget>
       <widget class="QWidget" name="page_2">
        <layout class="QGridLayout" name="gridLayout_18">
+        <item row="1" column="0">
+         <widget class="QPushButton" name="pushButton_28">
+          <property name="text">
+           <string>Ajouter la note</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QPushButton" name="pushButton_29">
+          <property name="text">
+           <string>Annuler</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_22">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="0,1,0">
-            <item>
-             <widget class="QLabel" name="label_13">
-              <property name="text">
-               <string>GCP</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_14">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_27">
-              <property name="text">
-               <string>Déconnection</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
           <item>
            <widget class="QScrollArea" name="scrollArea_7">
             <property name="widgetResizable">
@@ -934,7 +812,7 @@ QPushButton:hover {
                <x>0</x>
                <y>0</y>
                <width>436</width>
-               <height>405</height>
+               <height>437</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_19">
@@ -958,51 +836,12 @@ QPushButton:hover {
           </item>
          </layout>
         </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="pushButton_28">
-          <property name="text">
-           <string>Ajouter la note</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="pushButton_29">
-          <property name="text">
-           <string>Annuler</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="page_3">
        <layout class="QGridLayout" name="gridLayout_20">
         <item row="0" column="0">
          <layout class="QVBoxLayout" name="verticalLayout_24">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="0,1,0">
-            <item>
-             <widget class="QLabel" name="label_16">
-              <property name="text">
-               <string>GCP</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_15">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_30">
-              <property name="text">
-               <string>Déconnection</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
           <item>
            <widget class="QScrollArea" name="scrollArea_8">
             <property name="widgetResizable">
@@ -1013,8 +852,8 @@ QPushButton:hover {
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>436</width>
-               <height>435</height>
+               <width>98</width>
+               <height>28</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_21">
