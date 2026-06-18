@@ -63,20 +63,20 @@ QWidget* select::affichage_projets(const BDD::LigneElement& projet) {
     QLabel* imageLabel = new QLabel();
 
     if (pourcentage == 100) {
-        imageLabel->setPixmap(QPixmap(":/complétion/image/platine.png"));
+        imageLabel->setPixmap(QPixmap(":/completion/image/platine.png"));
         nb_projet_platine++;
     }
     else if(pourcentage >= 75){
-        imageLabel->setPixmap(QPixmap(":/complétion/image/or.png"));
+        imageLabel->setPixmap(QPixmap(":/completion/image/or.png"));
     }
     else if (pourcentage >= 50) {
-        imageLabel->setPixmap(QPixmap(":/complétion/image/fer.png"));
+        imageLabel->setPixmap(QPixmap(":/completion/image/fer.png"));
     }
     else if (pourcentage < 50 && pourcentage != 0) {
-        imageLabel->setPixmap(QPixmap(":/complétion/image/bronze.png"));
+        imageLabel->setPixmap(QPixmap(":/completion/image/bronze.png"));
     }
     else if (pourcentage == 0){
-        imageLabel->setPixmap(QPixmap(":/complétion/image/noir.png"));
+        imageLabel->setPixmap(QPixmap(":/completion/image/noir.png"));
     }
 
     imageLabel->setFixedSize(100, 100);

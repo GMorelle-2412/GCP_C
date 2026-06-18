@@ -27,7 +27,7 @@ Qt_main::Qt_main(QWidget* parent)
 
     class_select->bouton_creation_projet_clicked(ui->pushButton_10, ui->stackedWidget, ui->lineEdit_5, ui->lineEdit_6, ui->verticalLayout_8);
 
-    ui->label_17->setPixmap(QPixmap(":/complétion/image/platine.png"));
+    ui->label_17->setPixmap(QPixmap(":/completion/image/platine.png"));
     ui->label_17->setFixedSize(50, 50);
     ui->label_17->setScaledContents(true);
 
