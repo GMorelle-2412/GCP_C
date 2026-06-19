@@ -1,8 +1,9 @@
 ﻿#include "select.h"
 
 select::select(QObject* parent)
-    : QObject(parent)
+    : QObject(parent), class_BDD(new BDD())
 {
+
     sauve_modif_notes = new QWidget();
     layout_sauve_modif_notes = new QVBoxLayout(sauve_modif_notes);
 }
@@ -40,16 +41,29 @@ QWidget* select::affichage_projets(const BDD::LigneElement& projet) {
     }
 
     QWidget* projetWidget = new QWidget();
+
     QVBoxLayout* layout_principal = new QVBoxLayout(projetWidget);
 
     QVBoxLayout* zone_titre_description = new QVBoxLayout;
 
-    QLabel* titre = new QLabel(projet.nom);
+    QTextBrowser* titre = new QTextBrowser();
+    titre->setText(projet.nom);
+    titre->setFrameStyle(QFrame::NoFrame);
+    titre->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    titre->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     titre->setObjectName("titre");
+
     zone_titre_description->addWidget(titre);
 
-    QLabel* description = new QLabel(projet.description);
+    QTextBrowser* description = new QTextBrowser();
+    description->setText(projet.description);
+    description->setFrameStyle(QFrame::NoFrame);
+    description->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    description->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
     zone_titre_description->addWidget(description);
+
+    projetWidget->setMaximumWidth(400);   // par exemple
 
     QPushButton* bouton_modifier = new QPushButton("ouvrir");
     bouton_modifier->setObjectName("bouton_modifier");

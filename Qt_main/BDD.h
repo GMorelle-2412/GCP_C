@@ -74,7 +74,7 @@ public slots:
 
     /*Element*/
     std::vector<LigneElement> Get_element();
-    void Poste_element(const QString& nom, const QString& description);
+    int Poste_element(const QString& nom, const QString& description);
     void modif_element(int id, const QString& nom, const QString& description); 
 
 

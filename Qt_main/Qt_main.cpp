@@ -14,7 +14,6 @@ Qt_main::Qt_main(QWidget* parent)
 
     class_BDD->Connect_BDD();
 
-
     ui->stackedWidget->setCurrentIndex(3);
 
     

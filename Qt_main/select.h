@@ -16,6 +16,7 @@
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QTextEdit>
+#include <QTextBrowser>
 
 class select : public QObject {
     Q_OBJECT
@@ -46,6 +47,7 @@ public:
 
     int nb_projet = 0;
     int nb_projet_platine = 0;
+
 
 public slots:
 

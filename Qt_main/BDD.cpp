@@ -179,7 +179,7 @@ void BDD::Poste_contenu(int id_element, int id_liste){
 
     QSqlQuery query(QSqlDatabase::database());
 
-    query.prepare("INSERT INTO contenu (id_element, id_liste) VALUES (:id_element, :id_liste)");
+    query.prepare("INSERT INTO contenu_element_listes (id_element, id_liste) VALUES (:id_element, :id_liste)");
     query.bindValue(":id_element", id_element);
     query.bindValue(":id_liste", id_liste);
 
@@ -191,7 +191,7 @@ void BDD::Poste_contenu(int id_element, int id_liste){
 void BDD::delete_contenu(int id_liste)
 {
     QSqlQuery query(QSqlDatabase::database());
-    query.prepare("DELETE FROM contenu WHERE id_liste = :id");
+    query.prepare("DELETE FROM contenu_element_listes WHERE id_liste = :id");
     query.bindValue(":id", id_liste);
 
     if (!query.exec())
@@ -285,19 +285,20 @@ std::vector<BDD::LigneElement> BDD::Get_element() {
     return resultat;
 }
 
-void BDD::Poste_element(const QString& nom, const QString& description)
-{
+int BDD::Poste_element(const QString& nom, const QString& description){
+
     QSqlQuery query(QSqlDatabase::database());
+
     query.prepare("INSERT INTO element (nom, description) VALUES (:nom, :description)");
     query.bindValue(":nom", nom);
     query.bindValue(":description", description);
 
     if (!query.exec()) {
         qDebug() << "Erreur SQL Poste_element:" << query.lastError().text();
-        return;
+        return 0;
     }
 
-    id_element = query.lastInsertId().toInt();
+    return id_element = query.lastInsertId().toInt();
 }
 
 void BDD::modif_element(int id, const QString& nom, const QString& description)
