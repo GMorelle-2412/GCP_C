@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BDD.h"
+#include "AutoResizeTextBrowser.h"
 
 #include <QObject>
 #include <QWidget>

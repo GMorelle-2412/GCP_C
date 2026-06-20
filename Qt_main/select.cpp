@@ -10,102 +10,91 @@ select::select(QObject* parent)
 
 
 /*zone principale*/
-QWidget* select::affichage_projets(const BDD::LigneElement& projet) {
-    
-    /*Recherche */
+QWidget* select::affichage_projets(const BDD::LigneElement& projet)
+{
+    // Calcul du pourcentage
     auto data_liste = class_BDD->Get_liste();
     auto data_contenue = class_BDD->Get_contenu();
 
     for (int i = 0; i < data_contenue.size(); i++) {
-
         for (int j = 0; j < data_liste.size(); j++) {
 
-            if (data_contenue[i].id_element == projet.id) {
+            if (data_contenue[i].id_element == projet.id &&
+                data_contenue[i].id_liste == data_liste[j].id) {
 
-                if (data_contenue[i].id_liste == data_liste[j].id) {
+                sauvegarde_nb_liste_max++;
 
-                    sauvegarde_nb_liste_max++;
-
-                    if (data_liste[j].validation == 1) {
-
-                        sauvegarde_nb_liste_valider++;
-                    }
-                }
-            }  
+                if (data_liste[j].validation == 1)
+                    sauvegarde_nb_liste_valider++;
+            }
         }
     }
 
     int pourcentage = 0;
-    if (sauvegarde_nb_liste_max > 0) {
+    if (sauvegarde_nb_liste_max > 0)
         pourcentage = (sauvegarde_nb_liste_valider * 100) / sauvegarde_nb_liste_max;
-    }
 
+    // Widget principal
     QWidget* projetWidget = new QWidget();
+    projetWidget->setMaximumWidth(500);
+    projetWidget->setObjectName("zoneProjets");
 
     QVBoxLayout* layout_principal = new QVBoxLayout(projetWidget);
 
+    // Zone titre + description
     QVBoxLayout* zone_titre_description = new QVBoxLayout;
 
-    QTextBrowser* titre = new QTextBrowser();
+    AutoResizeTextBrowser* titre = new AutoResizeTextBrowser();
     titre->setText(projet.nom);
-    titre->setFrameStyle(QFrame::NoFrame);
-    titre->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    titre->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     titre->setObjectName("titre");
-
     zone_titre_description->addWidget(titre);
 
-    QTextBrowser* description = new QTextBrowser();
+    AutoResizeTextBrowser* description = new AutoResizeTextBrowser();
     description->setText(projet.description);
-    description->setFrameStyle(QFrame::NoFrame);
-    description->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    description->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-
     zone_titre_description->addWidget(description);
-
-    projetWidget->setMaximumWidth(400);   // par exemple
 
     QPushButton* bouton_modifier = new QPushButton("ouvrir");
     bouton_modifier->setObjectName("bouton_modifier");
     zone_titre_description->addWidget(bouton_modifier);
 
+    layout_principal->addLayout(zone_titre_description);
+
+    // Zone état
     QHBoxLayout* zone_etat = new QHBoxLayout;
 
-    QWidget* planing = new QWidget();
-    zone_etat->addWidget(planing);
+    QWidget* GANT = new QWidget;
+    zone_etat->addWidget(GANT);
 
     QLabel* imageLabel = new QLabel();
+    imageLabel->setFixedSize(100, 100);
+    imageLabel->setScaledContents(true);
 
     if (pourcentage == 100) {
         imageLabel->setPixmap(QPixmap(":/completion/image/platine.png"));
         nb_projet_platine++;
     }
-    else if(pourcentage >= 75){
+    else if (pourcentage >= 75) {
         imageLabel->setPixmap(QPixmap(":/completion/image/or.png"));
     }
     else if (pourcentage >= 50) {
         imageLabel->setPixmap(QPixmap(":/completion/image/fer.png"));
     }
-    else if (pourcentage < 50 && pourcentage != 0) {
+    else if (pourcentage > 0) {
         imageLabel->setPixmap(QPixmap(":/completion/image/bronze.png"));
     }
-    else if (pourcentage == 0){
+    else {
         imageLabel->setPixmap(QPixmap(":/completion/image/noir.png"));
     }
 
-    imageLabel->setFixedSize(100, 100);
-    imageLabel->setScaledContents(true);
     zone_etat->addWidget(imageLabel);
 
     QLabel* pourcentage_de_completion =
         new QLabel(QString::number(pourcentage) + " %");
     zone_etat->addWidget(pourcentage_de_completion);
 
-    layout_principal->addLayout(zone_titre_description);
     layout_principal->addLayout(zone_etat);
 
-    projetWidget->setObjectName("zoneProjets");
-
+    // Reset compteurs
     sauvegarde_nb_liste_max = 0;
     sauvegarde_nb_liste_valider = 0;
 
