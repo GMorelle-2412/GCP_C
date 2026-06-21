@@ -545,6 +545,8 @@ QWidget* select::affiche_note(QPushButton* bouton_affiche_note,
     QWidget* note = new QWidget();
     QVBoxLayout* layout_principal = new QVBoxLayout(note);
 
+    layout_principal->setSpacing(75);
+
     connect(bouton_affiche_note, &QPushButton::clicked, this, [=]() {
 
         // Nettoyage du layout principal
@@ -569,12 +571,13 @@ QWidget* select::affiche_note(QPushButton* bouton_affiche_note,
 
                 QVBoxLayout* layout_zone_note = new QVBoxLayout(zone_note);
 
-                QLabel* nom = new QLabel(noteData.nom);
+                AutoResizeTextBrowser* nom = new AutoResizeTextBrowser();
+                nom->setText(noteData.nom);
                 nom->setObjectName("titre");
                 layout_zone_note->addWidget(nom);
 
-                QLabel* text = new QLabel(noteData.text);
-                text->setWordWrap(true);
+                AutoResizeTextBrowser* text = new AutoResizeTextBrowser();
+                text->setText(noteData.text);
                 layout_zone_note->addWidget(text);
 
                 QPushButton* modif = new QPushButton("Modification");
@@ -627,36 +630,40 @@ void select::ajout_note(QStackedWidget* stackedWidget, QPushButton* bouton_ajout
         });
 }
 
-void select::affiche_modif_note(QStackedWidget* stackedWidget, QPushButton* bouton_modif_note, int id_note, QLabel* nom, QLabel* text, QVBoxLayout* verticalLayout) {
-
+void select::affiche_modif_note(QStackedWidget* stackedWidget,
+    QPushButton* bouton_modif_note,
+    int id_note,
+    AutoResizeTextBrowser* nom,
+    AutoResizeTextBrowser* text,
+    QVBoxLayout* verticalLayout)
+{
     bouton_modif_note->disconnect();
 
     connect(bouton_modif_note, &QPushButton::clicked, this, [=]() {
 
-        // 🔥 Nettoyage du layout
+        // Nettoyage du layout
         QLayoutItem* item;
         while ((item = layout_sauve_modif_notes->takeAt(0)) != nullptr) {
             delete item->widget();
             delete item;
         }
 
-        // 🔥 Remplissage
-        QLineEdit* editNom = new QLineEdit(nom->text());
+        // Remplissage avec le texte récupéré correctement
+        QLineEdit* editNom = new QLineEdit();
+        editNom->setText(nom->toPlainText());          // ✅ texte brut
         layout_sauve_modif_notes->addWidget(editNom);
 
-        QTextEdit* editText = new QTextEdit(text->text());
+        QTextEdit* editText = new QTextEdit();
+        editText->setPlainText(text->toPlainText());   // ✅ texte brut
         layout_sauve_modif_notes->addWidget(editText);
 
         QPushButton* save = new QPushButton("Enregistrer");
         layout_sauve_modif_notes->addWidget(save);
 
         connect(save, &QPushButton::clicked, this, [=]() {
-
             class_BDD->modif_note(id_note, editNom->text(), editText->toPlainText());
-
             nom->setText(editNom->text());
             text->setText(editText->toPlainText());
-
             stackedWidget->setCurrentIndex(8);
             });
 

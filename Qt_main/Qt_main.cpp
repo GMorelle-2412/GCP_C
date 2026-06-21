@@ -74,7 +74,6 @@ void Qt_main::select_affichage_projets() {
     ui->verticalLayout_12->addWidget(widgetModif);
 
     QWidget* widgetNote = class_select->affiche_note(ui->pushButton_18, ui->stackedWidget, ui->verticalLayout_25);
-    ui->verticalLayout_20->setSpacing(75);
     ui->verticalLayout_20->addWidget(widgetNote);
 
     class_select->zone_ajout_note(ui->pushButton_26, ui->stackedWidget);

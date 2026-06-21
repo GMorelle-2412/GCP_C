@@ -370,6 +370,20 @@ void Style::appliquerStyle(QMainWindow* fenetre)
             background-color: #232323;
         }
 
+
+        /* ── AutoResizeTextBrowser (titres et descriptions dynamiques) ── */
+        QTextBrowser {
+            background-color: transparent;
+            border: none;
+            color: #F0F0F0;
+        }
+
+        QTextBrowser#titre {
+            color: #E67E22;
+            font-size: 25pt;
+            background-color: transparent;
+            border: none;
+        }
     )";
 
     fenetre->setStyleSheet(styleGlobal);

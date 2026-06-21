@@ -85,5 +85,5 @@ public slots:
 
     void ajout_note(QStackedWidget* stackedWidget, QPushButton* bouton_ajout_note, QLineEdit* lineEdit_9, QTextEdit* textEdit);
 
-    void affiche_modif_note(QStackedWidget* stackedWidget, QPushButton* bouton_modif_note, int notes, QLabel *nom, QLabel *text, QVBoxLayout* verticalLayout);
+    void affiche_modif_note(QStackedWidget* stackedWidget, QPushButton* bouton_modif_note, int notes, AutoResizeTextBrowser *nom, AutoResizeTextBrowser *text, QVBoxLayout* verticalLayout);
 };
