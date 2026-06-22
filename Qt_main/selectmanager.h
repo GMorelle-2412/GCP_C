@@ -72,9 +72,10 @@ public slots:
     void zone_ajout_note(QPushButton* bouton_zone_ajout_note, QStackedWidget* stackedWidget);
     void ajout_note(QStackedWidget* stackedWidget, QPushButton* bouton_ajout_note,
         QLineEdit* lineEdit_9, QTextEdit* textEdit);
-    void affiche_modif_note(QStackedWidget* stackedWidget, QPushButton* bouton_modif_note,
-        int notes, AutoResizeTextBrowser* nom, AutoResizeTextBrowser* text,
-        QVBoxLayout* verticalLayout);
+    void affiche_modif_note(QStackedWidget* stackedWidget,
+        int id_note,
+        AutoResizeTextBrowser* nom,
+        AutoResizeTextBrowser* text);  // ? plus de QPushButton* ni QVBoxLayout*
     bool eventFilter(QObject* obj, QEvent* event) override;
 
 signals:

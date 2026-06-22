@@ -61,12 +61,19 @@ Qt_main::Qt_main(QWidget* parent)
     ui->label_18->setText(QString::number(class_select->nb_projet_platine) + " / " + QString::number(class_select->nb_projet));
     bouton_annulation();
 }
+
+
 void Qt_main::select_affichage_projets() {
 
     auto data_element = class_BDD->Get_element();
     std::vector<int> tab_id_element;
 
-    // --- AFFICHAGE DES PROJETS ---
+    // UNE SEULE connexion, avant la boucle
+    connect(class_select, &SelectManager::projetClicked, this,
+        [=](const BDD::LigneElement& projet) {
+            class_select->bouton_ouvrir_clicked(projet, ui->stackedWidget);
+        });
+
     for (const auto& element : data_element) {
         if (std::find(tab_id_element.begin(), tab_id_element.end(), element.id)
             != tab_id_element.end())
@@ -75,13 +82,8 @@ void Qt_main::select_affichage_projets() {
         tab_id_element.push_back(element.id);
 
         QWidget* widgetProjet = class_select->affichage_projets(element);
+        ui->verticalLayout_9->setSpacing(75);
         ui->verticalLayout_9->addWidget(widgetProjet);
-
-        // ← connect sur le signal corrigé
-        connect(class_select, &SelectManager::projetClicked, this,
-            [=](const BDD::LigneElement& projet) {
-                class_select->bouton_ouvrir_clicked(projet, ui->stackedWidget);
-            });
 
         class_select->nb_projet++;
     }
@@ -105,6 +107,11 @@ void Qt_main::select_affichage_projets() {
     class_select->ajout_note(ui->stackedWidget, ui->pushButton_28, ui->lineEdit_9, ui->textEdit);
 
     ui->verticalLayout_25->addWidget(class_select->sauve_modif_notes);
+
+    connect(class_select, &SelectManager::noteClicked, this,
+        [=](int id_note, AutoResizeTextBrowser* nom, AutoResizeTextBrowser* text) {
+            class_select->affiche_modif_note(ui->stackedWidget, id_note, nom, text);  // ← plus de nullptr ni verticalLayout
+        });
 }
 
 void Qt_main::bouton_annulation() {    

@@ -34,28 +34,37 @@ QWidget* SelectManager::affichage_projets(const BDD::LigneElement& projet)
     if (sauvegarde_nb_liste_max > 0)
         pourcentage = (sauvegarde_nb_liste_valider * 100) / sauvegarde_nb_liste_max;
 
-    // Widget principal
+    // Widget principal cliquable
     QWidget* projetWidget = new QWidget();
     projetWidget->setMaximumWidth(500);
     projetWidget->setObjectName("zoneProjets");
+    projetWidget->setCursor(Qt::PointingHandCursor); // curseur main au survol
+    projetWidget->installEventFilter(this);          // capture les clics
+
+    // Stocker le projet associé au widget
+    projetWidget->setProperty("projet_id", projet.id);
+    projetWidget->setProperty("projet_nom", projet.nom);
+    projetWidget->setProperty("projet_desc", projet.description);
 
     QVBoxLayout* layout_principal = new QVBoxLayout(projetWidget);
 
     // Zone titre + description
     QVBoxLayout* zone_titre_description = new QVBoxLayout;
 
+    // Après la création de titre et description, installez l'eventFilter
     AutoResizeTextBrowser* titre = new AutoResizeTextBrowser();
     titre->setText(projet.nom);
     titre->setObjectName("titre");
+    titre->installEventFilter(this);          // ← ajout
+    titre->setTextInteractionFlags(Qt::NoTextInteraction); // ← désactive sélection/clic texte
     zone_titre_description->addWidget(titre);
 
     AutoResizeTextBrowser* description = new AutoResizeTextBrowser();
     description->setText(projet.description);
+    description->setObjectName("description");
+    description->installEventFilter(this);    // ← ajout
+    description->setTextInteractionFlags(Qt::NoTextInteraction); // ← désactive sélection/clic texte
     zone_titre_description->addWidget(description);
-
-    QPushButton* bouton_modifier = new QPushButton("ouvrir");
-    bouton_modifier->setObjectName("bouton_modifier");
-    zone_titre_description->addWidget(bouton_modifier);
 
     layout_principal->addLayout(zone_titre_description);
 
@@ -238,10 +247,14 @@ QWidget* SelectManager::bouton_liste_clicked(QPushButton* bouton_liste, QStacked
             }
 
             // Titre
-            QLabel* titre = new QLabel(sauvegarde.nom);
+            AutoResizeTextBrowser* titre = new AutoResizeTextBrowser();
+            titre->setText(sauvegarde.nom);
+			titre->setObjectName("titre");
             layout_principal->addWidget(titre);
 
-            QLabel* description = new QLabel(sauvegarde.description);
+            AutoResizeTextBrowser* description = new AutoResizeTextBrowser();
+            description->setText(sauvegarde.description);
+			description->setObjectName("description");
             layout_principal->addWidget(description);
 
             // Récupération des données
@@ -263,7 +276,8 @@ QWidget* SelectManager::bouton_liste_clicked(QPushButton* bouton_liste, QStacked
                             validation->setChecked(liste.validation);
                             layout->addWidget(validation);
 
-                            QLabel* contenuLabel = new QLabel(liste.contenu, ligne);
+                            AutoResizeTextBrowser* contenuLabel = new AutoResizeTextBrowser();
+                            contenuLabel->setText(liste.contenu);
                             contenuLabel->setStyleSheet(
                                 liste.validation
                                 ? "color: #606060; text-decoration: line-through;"
@@ -280,7 +294,7 @@ QWidget* SelectManager::bouton_liste_clicked(QPushButton* bouton_liste, QStacked
                                         : "color: #F0F0F0;"
                                     );
 
-                                    class_BDD->modif_liste(id, contenuLabel->text(), checked);
+                                    class_BDD->modif_liste(id, contenuLabel->toPlainText(), checked);
                                 });
 
                             layout_principal->addWidget(ligne);
@@ -537,7 +551,6 @@ QWidget* SelectManager::affiche_note(QPushButton* bouton_affiche_note,
 
     QWidget* note = new QWidget();
     QVBoxLayout* layout_principal = new QVBoxLayout(note);
-
     layout_principal->setSpacing(75);
 
     connect(bouton_affiche_note, &QPushButton::clicked, this, [=]() {
@@ -558,36 +571,37 @@ QWidget* SelectManager::affiche_note(QPushButton* bouton_affiche_note,
 
             for (const auto& noteData : data_note) {
 
-                // 🔥 NOUVELLE ZONE POUR CHAQUE NOTE
                 QWidget* zone_note = new QWidget();
-                zone_note->setObjectName("zoneProjets");
+                zone_note->setObjectName("zoneNotes");  // ← était "zoneProjets", corrigé
+                zone_note->setCursor(Qt::PointingHandCursor);
+                zone_note->installEventFilter(this);
+
+                zone_note->setProperty("note_id", noteData.id);
+                zone_note->setProperty("note_nom", noteData.nom);
+                zone_note->setProperty("note_text", noteData.text);
 
                 QVBoxLayout* layout_zone_note = new QVBoxLayout(zone_note);
 
                 AutoResizeTextBrowser* nom = new AutoResizeTextBrowser();
                 nom->setText(noteData.nom);
                 nom->setObjectName("titre");
+                nom->installEventFilter(this);
+                nom->setTextInteractionFlags(Qt::NoTextInteraction);
                 layout_zone_note->addWidget(nom);
 
                 AutoResizeTextBrowser* text = new AutoResizeTextBrowser();
                 text->setText(noteData.text);
+                text->setObjectName("description");
+                text->installEventFilter(this);
+                text->setTextInteractionFlags(Qt::NoTextInteraction);
                 layout_zone_note->addWidget(text);
 
-                QPushButton* modif = new QPushButton("Modification");
-                modif->setObjectName("bouton_modifier");
-                layout_zone_note->addWidget(modif);
-
-                // Ajout de la zone au layout principal
                 layout_principal->addWidget(zone_note);
-
-                // Connexion modification
-                affiche_modif_note(stackedWidget, modif, contenu.id_notes, nom, text, verticalLayout);
             }
         }
 
         stackedWidget->setCurrentIndex(8);
         });
-
 
     return note;
 }
@@ -624,67 +638,71 @@ void SelectManager::ajout_note(QStackedWidget* stackedWidget, QPushButton* bouto
 }
 
 void SelectManager::affiche_modif_note(QStackedWidget* stackedWidget,
-    QPushButton* bouton_modif_note,
     int id_note,
     AutoResizeTextBrowser* nom,
-    AutoResizeTextBrowser* text,
-    QVBoxLayout* verticalLayout)
+    AutoResizeTextBrowser* text)
 {
-    bouton_modif_note->disconnect();
+    // Nettoyage du layout
+    QLayoutItem* item;
+    while ((item = layout_sauve_modif_notes->takeAt(0)) != nullptr) {
+        delete item->widget();
+        delete item;
+    }
 
-    connect(bouton_modif_note, &QPushButton::clicked, this, [=]() {
+    QLineEdit* editNom = new QLineEdit();
+    editNom->setText(nom->toPlainText());
+    layout_sauve_modif_notes->addWidget(editNom);
 
-        // Nettoyage du layout
-        QLayoutItem* item;
-        while ((item = layout_sauve_modif_notes->takeAt(0)) != nullptr) {
-            delete item->widget();
-            delete item;
-        }
+    QTextEdit* editText = new QTextEdit();
+    editText->setPlainText(text->toPlainText());
+    layout_sauve_modif_notes->addWidget(editText);
 
-        // Remplissage avec le texte récupéré correctement
-        QLineEdit* editNom = new QLineEdit();
-        editNom->setText(nom->toPlainText());          // ✅ texte brut
-        layout_sauve_modif_notes->addWidget(editNom);
+    QPushButton* save = new QPushButton("Enregistrer");
+    layout_sauve_modif_notes->addWidget(save);
 
-        QTextEdit* editText = new QTextEdit();
-        editText->setPlainText(text->toPlainText());   // ✅ texte brut
-        layout_sauve_modif_notes->addWidget(editText);
-
-        QPushButton* save = new QPushButton("Enregistrer");
-        layout_sauve_modif_notes->addWidget(save);
-
-        connect(save, &QPushButton::clicked, this, [=]() {
-            class_BDD->modif_note(id_note, editNom->text(), editText->toPlainText());
-            nom->setText(editNom->text());
-            text->setText(editText->toPlainText());
-            stackedWidget->setCurrentIndex(8);
-            });
-
-        stackedWidget->setCurrentIndex(10);
+    connect(save, &QPushButton::clicked, this, [=]() {
+        class_BDD->modif_note(id_note, editNom->text(), editText->toPlainText());
+        nom->setText(editNom->text());
+        text->setText(editText->toPlainText());
+        stackedWidget->setCurrentIndex(8);
         });
+
+    stackedWidget->setCurrentIndex(10);
 }
+
+
 
 bool SelectManager::eventFilter(QObject* obj, QEvent* event)
 {
-    if (event->type() == QEvent::MouseButtonRelease)
+    if (event->type() == QEvent::MouseButtonPress)
     {
+        if (qobject_cast<QPushButton*>(obj))
+            return QObject::eventFilter(obj, event);
+
         QWidget* w = qobject_cast<QWidget*>(obj);
+        while (w) {
+            if (qobject_cast<QPushButton*>(w))
+                return QObject::eventFilter(obj, event);
 
-        if (!w)
-            return false;
+            if (w->objectName() == "zoneProjets") {
+                BDD::LigneElement projet;
+                projet.id = w->property("projet_id").toInt();
+                projet.nom = w->property("projet_nom").toString();
+                projet.description = w->property("projet_desc").toString();
+                emit projetClicked(projet);
+                return true;
+            }
 
-        if (w->property("id_note").isValid())
-        {
-            int id_note = w->property("id_note").toInt();
-            AutoResizeTextBrowser* nom =
-                qobject_cast<AutoResizeTextBrowser*>(w->property("nom_widget").value<QObject*>());
-            AutoResizeTextBrowser* text =
-                qobject_cast<AutoResizeTextBrowser*>(w->property("text_widget").value<QObject*>());
+            if (w->objectName() == "zoneNotes") {  // ← nouveau cas
+                int id_note = w->property("note_id").toInt();
+                AutoResizeTextBrowser* nom = w->findChild<AutoResizeTextBrowser*>("titre");
+                AutoResizeTextBrowser* text = w->findChild<AutoResizeTextBrowser*>("description");
+                emit noteClicked(id_note, nom, text);
+                return true;
+            }
 
-            emit noteClicked(id_note, nom, text);
-            return true;
+            w = w->parentWidget();
         }
     }
-
     return QObject::eventFilter(obj, event);
 }

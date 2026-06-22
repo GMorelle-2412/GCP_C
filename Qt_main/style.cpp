@@ -334,6 +334,14 @@ QScrollBar:horizontal {
             padding: 50px;
         }
 
+        #zoneNotes {
+            background-color: #2E2E2E;
+            border-bottom: 2px solid #444;
+            border-left: 2px solid #E67E22;
+            padding: 50px;
+        }
+
+
         /* ── Scrollbars ──────────────────────────────────────────────────────── */
         QScrollBar:vertical {
             background-color: #232323;
