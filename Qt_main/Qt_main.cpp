@@ -2,40 +2,65 @@
 
 Qt_main::Qt_main(QWidget* parent)
     : QMainWindow(parent),
-      ui(new Ui::Qt_mainClass),
-      class_BDD(new BDD()),
-      class_select(new select()),
-      class_identification(new identification()),
-      class_style(new Style())
+    ui(new Ui::Qt_mainClass),
+    class_BDD(new BDD()),
+    class_select(new SelectManager()),
+    class_identification(new identification()),
+    class_style(new Style())
 {
-    ui->setupUi(this);     
-
+    ui->setupUi(this);
     class_style->appliquerStyle(this);
-
     class_BDD->Connect_BDD();
-
     ui->stackedWidget->setCurrentIndex(3);
 
-    
     select_affichage_projets();
 
+    // ── Scroll ultra-fluide sur toutes les ScrollArea ────────────────────────
+    QList<QScrollArea*> scrollAreas = {
+        ui->scrollArea,
+        ui->scrollArea_2,
+        ui->scrollArea_3,
+        ui->scrollArea_4,
+        ui->scrollArea_5,
+        ui->scrollArea_6,
+        ui->scrollArea_7,
+        ui->scrollArea_8
+    };
+
+    for (QScrollArea* scrollArea : scrollAreas) {
+        if (!scrollArea) continue;
+
+        scrollArea->setWidgetResizable(true);
+        scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+        QScroller::grabGesture(
+            scrollArea->viewport(),
+            QScroller::LeftMouseButtonGesture
+        );
+
+        QScrollerProperties props = QScroller::scroller(
+            scrollArea->viewport())->scrollerProperties();
+
+        props.setScrollMetric(QScrollerProperties::DecelerationFactor, 0.05);
+        props.setScrollMetric(QScrollerProperties::MaximumVelocity, 2.0);
+        props.setScrollMetric(QScrollerProperties::MinimumVelocity, 0.02);
+        props.setScrollMetric(QScrollerProperties::OvershootDragResistanceFactor, 0.1);
+        props.setScrollMetric(QScrollerProperties::SnapTime, 0.3);
+        props.setScrollMetric(QScrollerProperties::DragStartDistance, 0.002);
+
+        QScroller::scroller(scrollArea->viewport())->setScrollerProperties(props);
+    }
 
     class_select->zone_creation_projet(ui->stackedWidget, ui->pushButton_8);
-
     class_select->ajouter_liste(ui->verticalLayout_8, ui->pushButton_11);
-
     class_select->bouton_creation_projet_clicked(ui->pushButton_10, ui->stackedWidget, ui->lineEdit_5, ui->lineEdit_6, ui->verticalLayout_8);
-
     ui->label_17->setPixmap(QPixmap(":/completion/image/platine.png"));
     ui->label_17->setFixedSize(50, 50);
     ui->label_17->setScaledContents(true);
-
     ui->label_18->setText(QString::number(class_select->nb_projet_platine) + " / " + QString::number(class_select->nb_projet));
-
     bouton_annulation();
 }
-
-
 void Qt_main::select_affichage_projets() {
 
     auto data_element = class_BDD->Get_element();
@@ -43,20 +68,20 @@ void Qt_main::select_affichage_projets() {
 
     // --- AFFICHAGE DES PROJETS ---
     for (const auto& element : data_element) {
-
-        if (std::find(tab_id_element.begin(), tab_id_element.end(), element.id) != tab_id_element.end())
+        if (std::find(tab_id_element.begin(), tab_id_element.end(), element.id)
+            != tab_id_element.end())
             continue;
 
         tab_id_element.push_back(element.id);
 
         QWidget* widgetProjet = class_select->affichage_projets(element);
-        ui->verticalLayout_9->setSpacing(75);
         ui->verticalLayout_9->addWidget(widgetProjet);
 
-        QPushButton* bouton_modifier = widgetProjet->findChild<QPushButton*>("bouton_modifier");
-
-        if (bouton_modifier)
-            class_select->bouton_ouvrir_clicked(element, bouton_modifier, ui->stackedWidget);
+        // ← connect sur le signal corrigé
+        connect(class_select, &SelectManager::projetClicked, this,
+            [=](const BDD::LigneElement& projet) {
+                class_select->bouton_ouvrir_clicked(projet, ui->stackedWidget);
+            });
 
         class_select->nb_projet++;
     }

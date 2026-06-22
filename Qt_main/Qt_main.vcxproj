@@ -20,7 +20,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v145</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -36,7 +36,7 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>5.14.2_msvc2017_64</QtInstall>
+    <QtInstall>6.11.1_msvc2022_64</QtInstall>
     <QtModules>core;gui;widgets;sql</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
@@ -95,7 +95,7 @@
     <ClCompile Include="AutoResizeTextBrowser.cpp" />
     <ClCompile Include="identification.cpp" />
     <ClCompile Include="projet.cpp" />
-    <ClCompile Include="select.cpp" />
+    <ClCompile Include="SelectManager.cpp" />
     <ClCompile Include="style.cpp" />
     <QtRcc Include="Qt_main.qrc" />
     <QtUic Include="Qt_main.ui" />
@@ -107,9 +107,9 @@
   <ItemGroup>
     <QtMoc Include="BDD.h" />
     <QtMoc Include="AutoResizeTextBrowser.h" />
+    <QtMoc Include="SelectManager.h" />
     <ClInclude Include="projet.h" />
     <ClInclude Include="identification.h" />
-    <QtMoc Include="select.h" />
     <ClInclude Include="style.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

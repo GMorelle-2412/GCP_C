@@ -2,7 +2,7 @@
 #include "projet.h"
 #include "identification.h"
 #include "BDD.h"
-#include "select.h"
+#include "SelectManager.h"
 
 #include <QIcon>
 #include <QtWidgets/QApplication>

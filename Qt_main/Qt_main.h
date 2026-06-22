@@ -5,11 +5,14 @@
 #include "identification.h"
 #include "projet.h"
 #include "Style.h"
-#include "select.h"
 
 #include <QScroller>
 #include <QEasingCurve>
 #include <QtWidgets/QMainWindow>
+#include <QScrollBar>
+#include <QScrollerProperties>
+#include <QScrollArea>
+#include "SelectManager.h"
 
 
 class Qt_main : public QMainWindow {
@@ -23,7 +26,7 @@ public:
 
     BDD* class_BDD;
     identification* class_identification;
-    select* class_select;
+    SelectManager* class_select;
 	Style* class_style;
 
 private slots:

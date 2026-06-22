@@ -10,6 +10,17 @@ void Style::appliquerStyle(QMainWindow* fenetre)
                       #A0A0A0 texte secondaire | #606060 texte désactivé
            ════════════════════════════════════════════════════════════════════ */
 
+        /* ── Scrollbars ─────────────────────────────────────────────────────────── */
+QScrollBar:vertical {
+    width: 0px;
+    background: transparent;
+}
+
+QScrollBar:horizontal {
+    height: 0px;
+    background: transparent;
+}
+
         /* ── Base ──────────────────────────────────────────────────────────── */
         QMainWindow, QWidget {
             background-color: #232323;
@@ -153,11 +164,12 @@ void Style::appliquerStyle(QMainWindow* fenetre)
         QPushButton#pushButton_13, QPushButton#pushButton_18,
         QPushButton#pushButton_19, QPushButton#pushButton_23,
         QPushButton#pushButton_26, QPushButton#pushButton_28,
-        QPushButton#bouton_modifier,
         QPushButton[text="Enregistrer"] {
             min-height: 48px;
             padding: 12px 28px;
         }
+
+
 
         /* ── Boutons secondaires (annulation / retour) ─────────────────────────── */
         QPushButton#pushButton_4,  QPushButton#pushButton_6,
@@ -381,6 +393,12 @@ void Style::appliquerStyle(QMainWindow* fenetre)
         QTextBrowser#titre {
             color: #E67E22;
             font-size: 25pt;
+            background-color: transparent;
+            border: none;
+        }
+
+        QTextBrowser#description {
+            color: #F0F0F0;
             background-color: transparent;
             border: none;
         }

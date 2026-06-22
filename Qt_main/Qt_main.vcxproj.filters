@@ -49,7 +49,10 @@
     <ClCompile Include="projet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="select.cpp">
+    <ClCompile Include="AutoResizeTextBrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,13 +68,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="select.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="Qt_main.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="BDD.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="AutoResizeTextBrowser.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="SelectManager.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

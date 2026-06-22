@@ -7,11 +7,13 @@ SOURCES += \
     main.cpp \
     Qt_main.cpp \
     BDD.cpp \
+    selectmanager.cpp \
     style.cpp
 
 HEADERS += \
     Qt_main.h \
     BDD.h \
+    selectmanager.h \
     style.h
 
 FORMS += \
