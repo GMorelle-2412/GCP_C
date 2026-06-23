@@ -29,7 +29,6 @@ Qt_main::Qt_main(QWidget* parent)
 
     for (QScrollArea* scrollArea : scrollAreas) {
         if (!scrollArea) continue;
-
         scrollArea->setWidgetResizable(true);
         scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -39,15 +38,18 @@ Qt_main::Qt_main(QWidget* parent)
             QScroller::LeftMouseButtonGesture
         );
 
-        QScrollerProperties props = QScroller::scroller(
-            scrollArea->viewport())->scrollerProperties();
+        QScrollerProperties props = QScroller::scroller(scrollArea->viewport())->scrollerProperties();
 
-        props.setScrollMetric(QScrollerProperties::DecelerationFactor, 0.05);
-        props.setScrollMetric(QScrollerProperties::MaximumVelocity, 2.0);
-        props.setScrollMetric(QScrollerProperties::MinimumVelocity, 0.02);
-        props.setScrollMetric(QScrollerProperties::OvershootDragResistanceFactor, 0.1);
-        props.setScrollMetric(QScrollerProperties::SnapTime, 0.3);
-        props.setScrollMetric(QScrollerProperties::DragStartDistance, 0.002);
+        // ── Réactivité ──────────────────────────────────────────────
+        props.setScrollMetric(QScrollerProperties::DragStartDistance, 0.001);
+        props.setScrollMetric(QScrollerProperties::MinimumVelocity, 0.01);
+        props.setScrollMetric(QScrollerProperties::MaximumVelocity, 8.0);  // ↑ vitesse max augmentée
+
+        // ── Arrêt doux / inertie longue ─────────────────────────────
+        props.setScrollMetric(QScrollerProperties::DecelerationFactor, 0.05); // ↓ glisse longtemps
+        props.setScrollMetric(QScrollerProperties::OvershootDragResistanceFactor, 0.3);  // ↓ rebond discret
+        props.setScrollMetric(QScrollerProperties::OvershootScrollDistanceFactor, 0.1);  // rebond très court
+        props.setScrollMetric(QScrollerProperties::SnapTime, 0.4);  // ↑ transition plus lente
 
         QScroller::scroller(scrollArea->viewport())->setScrollerProperties(props);
     }

@@ -671,38 +671,81 @@ void SelectManager::affiche_modif_note(QStackedWidget* stackedWidget,
 }
 
 
-
 bool SelectManager::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::MouseButtonPress)
     {
-        if (qobject_cast<QPushButton*>(obj))
+        // Remonte la hiérarchie pour trouver un scroller actif
+        QScroller* scroller = nullptr;
+        QObject* o = obj;
+        while (o) {
+            scroller = QScroller::scroller(o);
+            if (scroller) break;
+            o = o->parent();
+        }
+
+        m_wasScrolling = scroller && scroller->state() != QScroller::Inactive;
+        m_pressPos = static_cast<QMouseEvent*>(event)->globalPosition();
+        m_pressedWidget = qobject_cast<QWidget*>(obj);
+
+        // Si inertie en cours → avale le Press pour ne pas l'interrompre
+        if (m_wasScrolling && scroller->state() == QScroller::Scrolling)
+            return true;
+
+        return QObject::eventFilter(obj, event);
+    }
+
+    if (event->type() == QEvent::MouseButtonRelease)
+    {
+        QPointF delta = static_cast<QMouseEvent*>(event)->globalPosition() - m_pressPos;
+        bool didMove = delta.manhattanLength() > 5;
+
+        if (m_wasScrolling || didMove)
+        {
+            m_wasScrolling = false;
+            m_pressedWidget = nullptr;
             return QObject::eventFilter(obj, event);
+        }
 
-        QWidget* w = qobject_cast<QWidget*>(obj);
+        // Tap propre → émettre le signal
+        QWidget* w = m_pressedWidget;
         while (w) {
-            if (qobject_cast<QPushButton*>(w))
+            if (qobject_cast<QPushButton*>(w)) {
+                m_pressedWidget = nullptr;
                 return QObject::eventFilter(obj, event);
-
+            }
             if (w->objectName() == "zoneProjets") {
                 BDD::LigneElement projet;
                 projet.id = w->property("projet_id").toInt();
                 projet.nom = w->property("projet_nom").toString();
                 projet.description = w->property("projet_desc").toString();
                 emit projetClicked(projet);
+                m_pressedWidget = nullptr;
                 return true;
             }
-
-            if (w->objectName() == "zoneNotes") {  // ← nouveau cas
+            if (w->objectName() == "zoneNotes") {
                 int id_note = w->property("note_id").toInt();
                 AutoResizeTextBrowser* nom = w->findChild<AutoResizeTextBrowser*>("titre");
                 AutoResizeTextBrowser* text = w->findChild<AutoResizeTextBrowser*>("description");
                 emit noteClicked(id_note, nom, text);
+                m_pressedWidget = nullptr;
                 return true;
             }
-
             w = w->parentWidget();
         }
+        m_pressedWidget = nullptr;
     }
+
     return QObject::eventFilter(obj, event);
+}
+
+bool SelectManager::isScrolling(QObject* obj)
+{
+    for (QObject* o : { obj, obj->parent() }) {
+        if (!o) continue;
+        QScroller* s = QScroller::scroller(o);
+        if (s && s->state() != QScroller::Inactive)
+            return true;
+    }
+    return false;
 }

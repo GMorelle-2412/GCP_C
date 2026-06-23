@@ -10,6 +10,7 @@
 #include <QStandardPaths>
 #include <QString>
 #include <vector>
+#include <QLabel.h>
 
 
 class BDD : public QObject {

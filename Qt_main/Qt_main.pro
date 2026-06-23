@@ -1,6 +1,6 @@
 QT += core gui widgets sql
 
-TARGET = Qt_main
+TARGET = GCP
 TEMPLATE = app
 
 SOURCES += \
@@ -8,13 +8,15 @@ SOURCES += \
     Qt_main.cpp \
     BDD.cpp \
     selectmanager.cpp \
-    style.cpp
+    style.cpp \
+    AutoResizeTextBrowser.cpp
 
 HEADERS += \
     Qt_main.h \
     BDD.h \
     selectmanager.h \
-    style.h
+    style.h \
+    AutoResizeTextBrowser.h
 
 FORMS += \
     Qt_main.ui

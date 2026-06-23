@@ -1,6 +1,7 @@
 #pragma once
 #include "BDD.h"
 #include "AutoResizeTextBrowser.h"
+
 #include <QObject>
 #include <QWidget>
 #include <QVBoxLayout>
@@ -16,6 +17,7 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QTextBrowser>
+#include <QScroller>
 
 class SelectManager : public QObject {
     Q_OBJECT
@@ -77,6 +79,12 @@ public slots:
         AutoResizeTextBrowser* nom,
         AutoResizeTextBrowser* text);  // ? plus de QPushButton* ni QVBoxLayout*
     bool eventFilter(QObject* obj, QEvent* event) override;
+    static bool isScrolling(QObject* obj);
+
+private:
+    bool m_wasScrolling = false;
+    QPointF m_pressPos;
+    QWidget* m_pressedWidget = nullptr; 
 
 signals:
     void projetClicked(const BDD::LigneElement& projet); // ? int ? LigneElement

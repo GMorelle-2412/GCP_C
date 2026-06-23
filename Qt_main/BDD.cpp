@@ -23,10 +23,13 @@ void BDD::Connect_BDD()
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(dbPath);
 
-    if (!db.open())
+    if (!db.open()) {
         qDebug() << "Erreur ouverture DB:" << db.lastError().text();
-    else
+    }
+        
+    else {
         qDebug() << "Ouverture DB succès :" << dbPath;
+    }
 }
 
 
