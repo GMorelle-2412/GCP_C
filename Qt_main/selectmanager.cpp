@@ -231,6 +231,8 @@ QWidget* SelectManager::bouton_liste_clicked(QPushButton* bouton_liste, QStacked
 
     // Widget qui sera rempli AU MOMENT DU CLIC
     QWidget* projetWidget = new QWidget();
+    projetWidget->setObjectName("widget_liste_contenu");
+
     QVBoxLayout* layout_principal = new QVBoxLayout(projetWidget);
 
     // On capture projetWidget et layout_principal dans la lambda
@@ -310,66 +312,88 @@ QWidget* SelectManager::bouton_liste_clicked(QPushButton* bouton_liste, QStacked
 }
 
 //Affichage de la page de modification du projet
-QWidget* SelectManager::bouton_modif_projet_clicked(QPushButton* bouton_modif_projet, QStackedWidget* stackedWidget, QLineEdit* nom, QLineEdit* description, QPushButton* bouton_ajouter, QVBoxLayout* verticalLayout, QPushButton* bouton_modif) {
-
-    bouton_modif_projet->disconnect();
-
+QWidget* SelectManager::bouton_modif_projet_clicked(
+    QPushButton* bouton_modif_projet,
+    QStackedWidget* stackedWidget,
+    QLineEdit* nom,
+    QLineEdit* description,
+    QPushButton* bouton_ajouter,
+    QVBoxLayout* verticalLayout,
+    QPushButton* bouton_modif, QPushButton* bouton_liste)
+{
     QWidget* WidgetModif = new QWidget();
     QVBoxLayout* layout_principal = new QVBoxLayout(WidgetModif);
 
-    connect(bouton_modif_projet, &QPushButton::clicked, this, [=]() {
-        nom->setText(sauvegarde.nom);
+    disconnect(bouton_modif_projet, nullptr, this, nullptr);
 
+    connect(bouton_modif_projet, &QPushButton::clicked, this, [=]() {
+
+        // --- Remplir les champs ---
+        nom->setText(sauvegarde.nom);
         description->setText(sauvegarde.description);
 
-        // Nettoyage si on reclique plusieurs fois
+        // --- Nettoyer layout_principal ---
         QLayoutItem* item;
         while ((item = layout_principal->takeAt(0)) != nullptr) {
-            delete item->widget();
+            if (auto w = item->widget()) w->deleteLater();
             delete item;
         }
 
-        // Récupération des données
+        // --- Nettoyer verticalLayout SAUF WidgetModif ---
+        for (int i = verticalLayout->count() - 1; i >= 0; i--) {
+            QLayoutItem* it = verticalLayout->itemAt(i);
+            if (!it) continue;
+            QWidget* w = it->widget();
+            if (w && w == WidgetModif) continue;
+            verticalLayout->takeAt(i);
+            if (w) w->deleteLater();
+            delete it;
+        }
+
+        // --- Charger les lignes existantes depuis la BDD ---
         auto data_liste = class_BDD->Get_liste();
-        auto data_contenue = class_BDD->Get_contenu();
+        auto data_contenu = class_BDD->Get_contenu();
 
-        for (const auto& contenu : data_contenue) {
-
+        for (const auto& contenu : data_contenu) {
             if (contenu.id_element == sauvegarde.id) {
 
                 for (const auto& liste : data_liste) {
-
                     if (liste.id == contenu.id_liste) {
 
                         QWidget* ligne = new QWidget(WidgetModif);
-                        QHBoxLayout* layout = new QHBoxLayout(ligne);
+                        ligne->setProperty("id_liste", liste.id); // ✅ tag BDD
+
+                        QVBoxLayout* Vlayout = new QVBoxLayout(ligne);
+                        QHBoxLayout* Hlayout = new QHBoxLayout();
 
                         QCheckBox* validation = new QCheckBox(ligne);
                         validation->setChecked(liste.validation);
-                        layout->addWidget(validation);
+                        Hlayout->addWidget(validation);
 
-                        QLabel* contenuLabel = new QLabel(liste.contenu, ligne);
+                        QLineEdit* contenuLabel = new QLineEdit(liste.contenu, ligne);
                         contenuLabel->setStyleSheet(
                             liste.validation
                             ? "color: #606060; text-decoration: line-through;"
                             : "color: #606060;"
                         );
-                        layout->addWidget(contenuLabel);
+                        Hlayout->addWidget(contenuLabel);
 
                         connect(validation, &QCheckBox::toggled, this,
                             [this, contenuLabel, id = liste.id](bool checked) {
-
                                 contenuLabel->setStyleSheet(
                                     checked
                                     ? "color: #606060; text-decoration: line-through;"
-                                    : "color: #F0F0F0;"
+                                    : "color: #606060;"
                                 );
-
                                 class_BDD->modif_liste(id, contenuLabel->text(), checked);
                             });
 
                         QPushButton* bouton_supprimer = new QPushButton("X", ligne);
-                        layout->addWidget(bouton_supprimer);
+                        connect(bouton_supprimer, &QPushButton::clicked, this,
+                            [ligne]() { ligne->deleteLater(); });
+
+                        Vlayout->addLayout(Hlayout);
+                        Vlayout->addWidget(bouton_supprimer);
 
                         layout_principal->addWidget(ligne);
                     }
@@ -377,9 +401,8 @@ QWidget* SelectManager::bouton_modif_projet_clicked(QPushButton* bouton_modif_pr
             }
         }
 
-        ajout_liste_modif(bouton_ajouter, verticalLayout);
-
-        modif_projet(bouton_modif, stackedWidget, nom, description, verticalLayout);
+        ajout_liste_modif(bouton_ajouter, layout_principal); // ✅ layout_principal, pas verticalLayout
+        modif_projet(bouton_modif, stackedWidget, nom, description, layout_principal, bouton_liste);
 
         stackedWidget->setCurrentIndex(5);
         });
@@ -387,36 +410,41 @@ QWidget* SelectManager::bouton_modif_projet_clicked(QPushButton* bouton_modif_pr
     return WidgetModif;
 }
 
-void SelectManager::ajout_liste_modif(QPushButton* bouton_ajouter, QVBoxLayout* verticalLayout) {
+void SelectManager::ajout_liste_modif(QPushButton* bouton_ajouter, QVBoxLayout* verticalLayout)
+{
     disconnect(bouton_ajouter, nullptr, this, nullptr);
 
     connect(bouton_ajouter, &QPushButton::clicked, this, [=]() {
-        int last = verticalLayout->count() - 1;
-        if (last >= 0) {
-            QLayoutItem* lastItem = verticalLayout->itemAt(last);
 
-            if (lastItem && !lastItem->widget()) {
-                verticalLayout->takeAt(last);
-                delete lastItem;
+
+        // --- 1) Retirer le stretch final s'il existe ---
+        int count = verticalLayout->count();
+        if (count > 0) {
+            QLayoutItem* last = verticalLayout->itemAt(count - 1);
+            if (last && last->spacerItem()) {
+                verticalLayout->takeAt(count - 1);
+                delete last;
             }
         }
 
+        // --- 2) Création de la ligne ---
         QWidget* ligne = new QWidget();
         ligne->setMaximumHeight(120);
+
+        ligne->setProperty("id_liste", -1); // ✅ -1 = nouvelle ligne
 
         QVBoxLayout* zone = new QVBoxLayout(ligne);
         zone->setContentsMargins(8, 8, 8, 8);
         zone->setSpacing(6);
 
         QWidget* rangee = new QWidget(ligne);
-
         QHBoxLayout* layoutRangee = new QHBoxLayout(rangee);
         layoutRangee->setContentsMargins(0, 0, 0, 0);
         layoutRangee->setSpacing(8);
 
         QCheckBox* validation = new QCheckBox(rangee);
-
         QLineEdit* contenu = new QLineEdit("", rangee);
+
         layoutRangee->addWidget(validation);
         layoutRangee->addWidget(contenu);
 
@@ -428,114 +456,160 @@ void SelectManager::ajout_liste_modif(QPushButton* bouton_ajouter, QVBoxLayout* 
         zone->addWidget(supp);
 
         verticalLayout->addWidget(ligne);
-        verticalLayout->addStretch();
 
-        connect(supp, &QPushButton::clicked, this, [ligne]() { ligne->deleteLater(); });
+        // --- 3) Bouton supprimer ---
+        connect(supp, &QPushButton::clicked, this, [=]() {
+            ligne->deleteLater();
+            });
+
+        // --- 4) Remettre un seul stretch en bas ---
+        verticalLayout->addStretch();
         });
 }
 
-void SelectManager::modif_projet(QPushButton* bouton_modif, QStackedWidget* stackedWidget, QLineEdit* nom, QLineEdit* description, QVBoxLayout* verticalLayout) {
-
+void SelectManager::modif_projet(
+    QPushButton* bouton_modif,
+    QStackedWidget* stackedWidget,
+    QLineEdit* nom,
+    QLineEdit* description,
+    QVBoxLayout* layout_principal,
+    QPushButton* bouton_liste)
+{
     disconnect(bouton_modif, nullptr, this, nullptr);
 
     int id_element = sauvegarde.id;
 
-    std::vector<BDD::LigneElement> data_element;
-    std::vector<BDD::LigneListe> data_liste;
-    std::vector<BDD::LigneContenueElement> data_contenue_liste;
-
     connect(bouton_modif, &QPushButton::clicked, this, [=]() {
 
-        for (int y = 0; y < data_element.size(); y++) {
-            if (id_element == data_element[y].id)
-                class_BDD->modif_element(id_element, nom->text(), description->text());
-        }
+        // --- 1) Mise à jour BDD ---
+        class_BDD->modif_element(id_element, nom->text(), description->text());
 
-        int max_liste = 0;
-        for (int f = 0; f < data_contenue_liste.size(); f++)
+        // --- 2) Mettre à jour sauvegarde ---
+        sauvegarde.nom = nom->text();
+        sauvegarde.description = description->text();
 
-            for (int h = 0; h < data_liste.size(); h++)
+        // --- 3) Gestion des listes ---
+        auto data_contenu = class_BDD->Get_contenu();
+        std::vector<int> ids_en_bdd;
+        for (const auto& c : data_contenu)
+            if (c.id_element == id_element)
+                ids_en_bdd.push_back(c.id_liste);
 
-                if (id_element == data_contenue_liste[f].id_element &&
-                    data_contenue_liste[f].id_liste == data_liste[h].id)
-                    max_liste++;
+        std::vector<int> ids_vus_ui;
 
-        if (verife_reste_liste == -1) {
-            int reste = verticalLayout->count() - max_liste;
+        for (int i = 0; i < layout_principal->count(); i++) {
+            QLayoutItem* layoutItem = layout_principal->itemAt(i);
+            if (!layoutItem) continue;
+            QWidget* w = layoutItem->widget();
+            if (!w) continue;
 
-            if (reste < 0) reste *= -1;
-
-            verife_reste_liste = reste;
-        }
-
-        int compteur_update = 0;
-        int nb = verticalLayout->count();
-
-        for (int i = 0; i < max_liste; i++) {
-            QLayoutItem* item = verticalLayout->itemAt(i);
-
-            if (!item) continue;
-
-            QWidget* ligne = item->widget();
-
-            if (!ligne) continue;
-
-            QLineEdit* contenu = ligne->findChild<QLineEdit*>();
-            QCheckBox* validation = ligne->findChild<QCheckBox*>();
-
+            QLineEdit* contenu = w->findChild<QLineEdit*>();
+            QCheckBox* validation = w->findChild<QCheckBox*>();
             if (!contenu || !validation) continue;
 
-            qDebug() << "Ligne" << i << "Texte:" << contenu->text() << "Valide:" << validation->isChecked();
+            int id_liste = w->property("id_liste").toInt();
 
-            class_BDD->modif_liste(table_id_liste_modif[i], contenu->text(), validation->isChecked());
-
-            compteur_update++;
-        }
-
-        if (nb > max_liste) {
-            for (int i = 0; i < nb - max_liste; i++) {
-
-                QLayoutItem* item = verticalLayout->itemAt(i + compteur_update);
-
-                if (!item) continue;
-
-                QWidget* ligne = item->widget();
-
-                if (!ligne) continue;
-
-                QLineEdit* contenu = ligne->findChild<QLineEdit*>();
-                QCheckBox* validation = ligne->findChild<QCheckBox*>();
-
-                if (!contenu || !validation) continue;
-
-                qDebug() << "Nouvelle Ligne" << i << "Texte:" << contenu->text() << "Valide:" << validation->isChecked();
-
-                int id_liste = class_BDD->Poste_liste(contenu->text(), validation->isChecked());
-
-                class_BDD->Poste_contenu(id_element, id_liste);
+            if (id_liste == -1) {
+                int nouvel_id = class_BDD->Poste_liste(
+                    contenu->text(), validation->isChecked());
+                if (nouvel_id != -1)
+                    class_BDD->Poste_contenu(id_element, nouvel_id);
+            }
+            else {
+                class_BDD->modif_liste(id_liste, contenu->text(), validation->isChecked());
+                ids_vus_ui.push_back(id_liste);
             }
         }
 
-        if (nb < max_liste) {
-            int nb_delete = max_liste - nb;
-
-            qDebug() << "Suppression de" << nb_delete << "lignes dans la BDD";
-
-            for (int i = 0; i < nb_delete; i++) {
-                int id_liste = table_id_liste_modif.back();
-
-                table_id_liste_modif.pop_back();
-
-                qDebug() << "Suppression id_liste =" << id_liste;
-
-                class_BDD->delete_liste(id_liste);
-
-                class_BDD->delete_contenu(id_liste);
+        for (int id : ids_en_bdd) {
+            bool encore_present = std::find(
+                ids_vus_ui.begin(), ids_vus_ui.end(), id) != ids_vus_ui.end();
+            if (!encore_present) {
+                class_BDD->delete_liste(id);
+                class_BDD->delete_contenu(id);
             }
         }
 
-        stackedWidget->setCurrentIndex(3);
-        //affiche_element_liste();
+        // --- 4) Rafraîchir la page liste ---
+        QWidget* widgetListe = stackedWidget->findChild<QWidget*>("widget_liste_contenu");
+
+        if (widgetListe) {
+
+            // ✅ Vider sans détruire le layout (évite le dangling pointer dans bouton_liste)
+            if (QLayout* oldLayout = widgetListe->layout()) {
+                QLayoutItem* item;
+                while ((item = oldLayout->takeAt(0)) != nullptr) {
+                    if (QWidget* w = item->widget()) {
+                        w->hide();
+                        delete w;
+                    }
+                    delete item;
+                }
+                // ❌ NE PAS faire delete oldLayout
+
+                QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(oldLayout);
+
+                // Titre
+                AutoResizeTextBrowser* titre = new AutoResizeTextBrowser();
+                titre->setText(sauvegarde.nom);
+                titre->setObjectName("titre");
+                layout->addWidget(titre);
+
+                // Description
+                AutoResizeTextBrowser* desc_label = new AutoResizeTextBrowser();
+                desc_label->setText(sauvegarde.description);
+                desc_label->setObjectName("description");
+                layout->addWidget(desc_label);
+
+                // Données fraîches
+                auto data_liste_fresh = class_BDD->Get_liste();
+                auto data_contenu_fresh = class_BDD->Get_contenu();
+
+                for (const auto& c : data_contenu_fresh) {
+                    if (c.id_element == sauvegarde.id) {
+                        for (const auto& liste : data_liste_fresh) {
+                            if (liste.id == c.id_liste) {
+
+                                QWidget* ligne = new QWidget(widgetListe);
+                                QHBoxLayout* Hlayout = new QHBoxLayout(ligne);
+                                Hlayout->setContentsMargins(0, 0, 0, 0);
+                                Hlayout->setSpacing(8);
+
+                                QCheckBox* val = new QCheckBox(ligne);
+                                val->setChecked(liste.validation);
+                                Hlayout->addWidget(val);
+
+                                AutoResizeTextBrowser* contenuLabel = new AutoResizeTextBrowser();
+                                contenuLabel->setText(liste.contenu);
+                                contenuLabel->setStyleSheet(
+                                    liste.validation
+                                    ? "color: #606060; text-decoration: line-through;"
+                                    : "color: #606060;"
+                                );
+                                Hlayout->addWidget(contenuLabel);
+
+                                connect(val, &QCheckBox::toggled, this,
+                                    [this, contenuLabel, id = liste.id](bool checked) {
+                                        contenuLabel->setStyleSheet(
+                                            checked
+                                            ? "color: #606060; text-decoration: line-through;"
+                                            : "color: #F0F0F0;"
+                                        );
+                                        class_BDD->modif_liste(
+                                            id, contenuLabel->toPlainText(), checked);
+                                    });
+
+                                layout->addWidget(ligne);
+                            }
+                        }
+                    }
+                }
+
+                layout->addStretch();
+            }
+        }
+
+        stackedWidget->setCurrentIndex(7);
         });
 }
 

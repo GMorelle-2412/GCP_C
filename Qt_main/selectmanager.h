@@ -19,6 +19,7 @@
 #include <QTextBrowser>
 #include <QScroller>
 
+
 class SelectManager : public QObject {
     Q_OBJECT
 public:
@@ -63,10 +64,10 @@ public slots:
     QWidget* bouton_modif_projet_clicked(QPushButton* bouton_modif_projet, QStackedWidget* stackedWidget,
         QLineEdit* nom, QLineEdit* description,
         QPushButton* bouton_ajouter, QVBoxLayout* verticalLayout,
-        QPushButton* bouton_modif);
+        QPushButton* bouton_modif, QPushButton* bouton_liste);
     void ajout_liste_modif(QPushButton* bouton_ajouter, QVBoxLayout* verticalLayout);
     void modif_projet(QPushButton* bouton_modif, QStackedWidget* stackedWidget,
-        QLineEdit* nom, QLineEdit* description, QVBoxLayout* verticalLayout);
+        QLineEdit* nom, QLineEdit* description, QVBoxLayout* verticalLayout, QPushButton* bouton_liste);
 
     /* Notes */
     QWidget* affiche_note(QPushButton* bouton_affiche_note, QStackedWidget* stackedWidget,

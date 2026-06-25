@@ -152,29 +152,32 @@ void BDD::delete_liste(int id_liste)
 
 
 /*Contenu_element_listes*/
-std::vector<BDD::LigneContenueElement> BDD::Get_contenu() {
-
+std::vector<BDD::LigneContenueElement> BDD::Get_contenu()
+{
     std::vector<LigneContenueElement> resultat;
+    QSqlQuery query(QSqlDatabase::database());
 
-        for (const LigneListe& item : Get_liste()) {
-            QSqlQuery query(QSqlDatabase::database());
-            query.prepare("SELECT * FROM contenu_element_listes WHERE id_liste = :id_liste");
-            query.bindValue(":id_liste", item.id);
+    // Une seule requête via JOIN pour éviter le problème N+1
+    query.prepare(R"(
+        SELECT cel.*
+        FROM contenu_element_listes cel
+        INNER JOIN liste l ON l.id = cel.id_liste
+        WHERE l.id_user = :id_user
+    )");
+    query.bindValue(":id_user", 3);
 
-            if (!query.exec()) {
-                qDebug() << "Erreur SQL Get_contenu:" << query.lastError().text();
-                continue;
-            }
+    if (!query.exec()) {
+        qDebug() << "Erreur SQL Get_contenu:" << query.lastError().text();
+        return resultat;
+    }
 
-            while (query.next()) {
-                LigneContenueElement ligne;
-                ligne.id = query.value("id").toInt();
-                ligne.id_element = query.value("id_element").toInt();
-                ligne.id_liste = query.value("id_liste").toInt();
-                resultat.push_back(ligne);
-            }
-        }
-    
+    while (query.next()) {
+        LigneContenueElement ligne;
+        ligne.id = query.value("id").toInt();
+        ligne.id_element = query.value("id_element").toInt();
+        ligne.id_liste = query.value("id_liste").toInt();
+        resultat.push_back(ligne);
+    }
     return resultat;
 }
 

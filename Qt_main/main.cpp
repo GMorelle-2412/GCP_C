@@ -1,5 +1,4 @@
 #include "Qt_main.h"
-#include "projet.h"
 #include "identification.h"
 #include "BDD.h"
 #include "SelectManager.h"

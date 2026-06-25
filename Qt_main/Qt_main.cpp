@@ -54,18 +54,18 @@ Qt_main::Qt_main(QWidget* parent)
         QScroller::scroller(scrollArea->viewport())->setScrollerProperties(props);
     }
 
-    class_select->zone_creation_projet(ui->stackedWidget, ui->pushButton_8);
-    class_select->ajouter_liste(ui->verticalLayout_8, ui->pushButton_11);
-    class_select->bouton_creation_projet_clicked(ui->pushButton_10, ui->stackedWidget, ui->lineEdit_5, ui->lineEdit_6, ui->verticalLayout_8);
-    ui->label_17->setPixmap(QPixmap(":/completion/image/platine.png"));
-    ui->label_17->setFixedSize(50, 50);
-    ui->label_17->setScaledContents(true);
-    ui->label_18->setText(QString::number(class_select->nb_projet_platine) + " / " + QString::number(class_select->nb_projet));
+    
     bouton_annulation();
 }
 
 
 void Qt_main::select_affichage_projets() {
+
+    QLayoutItem* item;
+    while ((item = ui->verticalLayout_9->takeAt(0)) != nullptr) {
+        delete item->widget();
+        delete item;
+    }
 
     auto data_element = class_BDD->Get_element();
     std::vector<int> tab_id_element;
@@ -90,7 +90,20 @@ void Qt_main::select_affichage_projets() {
         class_select->nb_projet++;
     }
 
-    // --- WIDGETS UNIQUES (hors boucle) ---
+    // --- WIDGETS UNIQUES (hors boucle) ---*
+    class_select->zone_creation_projet(ui->stackedWidget, ui->pushButton_8);
+    class_select->ajouter_liste(ui->verticalLayout_8, ui->pushButton_11);
+    class_select->bouton_creation_projet_clicked(ui->pushButton_10, ui->stackedWidget, ui->lineEdit_5, ui->lineEdit_6, ui->verticalLayout_8);
+    ui->label_17->setPixmap(QPixmap(":/completion/image/platine.png"));
+    ui->label_17->setFixedSize(50, 50);
+    ui->label_17->setScaledContents(true);
+    ui->label_18->setText(QString::number(class_select->nb_projet_platine) + " / " + QString::number(class_select->nb_projet));
+
+    QLayoutItem* item_;
+    while ((item_ = ui->verticalLayout_21->takeAt(0)) != nullptr) {
+        delete item_->widget();
+        delete item_;
+    }
     QWidget* widgetListe = class_select->bouton_liste_clicked(ui->pushButton_19, ui->stackedWidget);
     ui->verticalLayout_21->addWidget(widgetListe);
 
@@ -98,7 +111,7 @@ void Qt_main::select_affichage_projets() {
         ui->pushButton_23, ui->stackedWidget,
         ui->lineEdit_7, ui->lineEdit_8,
         ui->pushButton_12, ui->verticalLayout_12,
-        ui->pushButton_13
+        ui->pushButton_13, ui->pushButton_19
     );
     ui->verticalLayout_12->addWidget(widgetModif);
 
@@ -114,6 +127,9 @@ void Qt_main::select_affichage_projets() {
         [=](int id_note, AutoResizeTextBrowser* nom, AutoResizeTextBrowser* text) {
             class_select->affiche_modif_note(ui->stackedWidget, id_note, nom, text);  // ← plus de nullptr ni verticalLayout
         });
+
+    class_select->nb_projet_platine = 0;
+    class_select->nb_projet = 0;
 }
 
 void Qt_main::bouton_annulation() {    
@@ -127,6 +143,8 @@ void Qt_main::bouton_annulation() {
 	ui->pushButton_16->disconnect();
     connect(ui->pushButton_16, &QPushButton::clicked, this, [=]() {
 
+        select_affichage_projets();
+
         ui->stackedWidget->setCurrentIndex(3);
 		});
 
@@ -138,6 +156,9 @@ void Qt_main::bouton_annulation() {
 
 	ui->pushButton_9->disconnect();
     connect(ui->pushButton_9, &QPushButton::clicked, this, [=]() {
+
+        select_affichage_projets();
+
         ui->stackedWidget->setCurrentIndex(3);
 		});
 

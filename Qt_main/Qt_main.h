@@ -3,7 +3,6 @@
 #include "ui_Qt_main.h"
 #include "BDD.h"
 #include "identification.h"
-#include "projet.h"
 #include "Style.h"
 
 #include <QScroller>

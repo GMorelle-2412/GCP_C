@@ -94,7 +94,6 @@
   <ItemGroup>
     <ClCompile Include="AutoResizeTextBrowser.cpp" />
     <ClCompile Include="identification.cpp" />
-    <ClCompile Include="projet.cpp" />
     <ClCompile Include="SelectManager.cpp" />
     <ClCompile Include="style.cpp" />
     <QtRcc Include="Qt_main.qrc" />
@@ -108,7 +107,6 @@
     <QtMoc Include="BDD.h" />
     <QtMoc Include="AutoResizeTextBrowser.h" />
     <QtMoc Include="SelectManager.h" />
-    <ClInclude Include="projet.h" />
     <ClInclude Include="identification.h" />
     <ClInclude Include="style.h" />
   </ItemGroup>
