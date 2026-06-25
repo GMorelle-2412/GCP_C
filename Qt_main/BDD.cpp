@@ -360,3 +360,33 @@ int BDD::Poste_note(const QString& text, const QString& nom) {
 
     return query.lastInsertId().toInt();
 }
+
+/*A trier*/
+void BDD::delete_element(int id_element)
+{
+    QSqlQuery query(QSqlDatabase::database());
+    query.prepare("DELETE FROM element WHERE id = :id");
+    query.bindValue(":id", id_element);
+    if (!query.exec())
+        qDebug() << "Erreur SQL delete_element:" << query.lastError().text();
+}
+
+void BDD::delete_element_complet(int id_element)
+{
+    // 1) Récupérer tous les id_liste liés à cet élément
+    auto data_contenu = Get_contenu();
+    std::vector<int> ids_listes;
+
+    for (const auto& c : data_contenu)
+        if (c.id_element == id_element)
+            ids_listes.push_back(c.id_liste);
+
+    // 2) Supprimer chaque liste + son lien contenu
+    for (int id_liste : ids_listes) {
+        delete_liste(id_liste);
+        delete_contenu(id_liste);
+    }
+
+    // 3) Supprimer l'élément lui-même
+    delete_element(id_element);
+}

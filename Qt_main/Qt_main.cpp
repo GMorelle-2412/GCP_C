@@ -130,6 +130,12 @@ void Qt_main::select_affichage_projets() {
 
     class_select->nb_projet_platine = 0;
     class_select->nb_projet = 0;
+
+    class_select->bouton_supprimer_projet_clicked(
+        ui->pushButton_7, // ton bouton supprimer
+        ui->stackedWidget,
+        [this]() { select_affichage_projets(); } // ✅ rafraîchit la liste après suppression
+    );
 }
 
 void Qt_main::bouton_annulation() {    

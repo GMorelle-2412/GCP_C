@@ -101,4 +101,9 @@ public slots:
     /*Notes*/
     std::vector<LigneNote> Get_note(int id_note);
     int Poste_note(const QString& text, const QString& nom);
+
+    /*A trier*/
+    // BDD.h — ajouter dans la classe
+    void delete_element(int id_element);
+    void delete_element_complet(int id_element); // supprime tout en cascade
 };

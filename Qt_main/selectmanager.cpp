@@ -823,3 +823,41 @@ bool SelectManager::isScrolling(QObject* obj)
     }
     return false;
 }
+
+/*Autre a trier*/
+void SelectManager::bouton_supprimer_projet_clicked(
+    QPushButton* bouton_supprimer,
+    QStackedWidget* stackedWidget,
+    std::function<void()> rafraichir_liste_projets)
+{
+    disconnect(bouton_supprimer, nullptr, this, nullptr);
+
+    connect(bouton_supprimer, &QPushButton::clicked, this, [=]() {
+
+        if (sauvegarde.id <= 0) return;
+
+        // Confirmation avant suppression
+        QMessageBox::StandardButton reponse = QMessageBox::question(
+            nullptr,
+            "Supprimer le projet",
+            "Supprimer « " + sauvegarde.nom + " » et toutes ses listes ?",
+            QMessageBox::Yes | QMessageBox::No
+        );
+
+        if (reponse != QMessageBox::Yes) return;
+
+        // Suppression en cascade
+        class_BDD->delete_element_complet(sauvegarde.id);
+
+        // Reset sauvegarde
+        sauvegarde.id = -1;
+        sauvegarde.nom = "";
+        sauvegarde.description = "";
+
+        // Rafraîchir l'affichage des projets
+        rafraichir_liste_projets();
+
+        // Retour à la page principale
+        stackedWidget->setCurrentIndex(3);
+        });
+}

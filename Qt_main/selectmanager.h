@@ -18,6 +18,7 @@
 #include <QTextEdit>
 #include <QTextBrowser>
 #include <QScroller>
+#include <QMessageBox>
 
 
 class SelectManager : public QObject {
@@ -81,6 +82,13 @@ public slots:
         AutoResizeTextBrowser* text);  // ? plus de QPushButton* ni QVBoxLayout*
     bool eventFilter(QObject* obj, QEvent* event) override;
     static bool isScrolling(QObject* obj);
+
+
+
+    void bouton_supprimer_projet_clicked(
+        QPushButton* bouton_supprimer,
+        QStackedWidget* stackedWidget,
+        std::function<void()> rafraichir_liste_projets);
 
 private:
     bool m_wasScrolling = false;
