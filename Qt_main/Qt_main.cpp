@@ -29,9 +29,30 @@ Qt_main::Qt_main(QWidget* parent)
 
     for (QScrollArea* scrollArea : scrollAreas) {
         if (!scrollArea) continue;
+
+        scrollArea->verticalScrollBar()->setStyleSheet(
+            "QScrollBar:vertical {"
+            "    width: 18px;"                // ← largeur de la barre
+            "    margin: 0px;"
+            "}"
+            "QScrollBar::handle:vertical {"
+            "    min-height: 40px;"           // ← taille minimale du curseur
+            "    border-radius: 6px;"
+            "}"
+            "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {"
+            "    height: 0px;"
+            "}"
+        );
+
+
         scrollArea->setWidgetResizable(true);
-        scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+        QScroller::ungrabGesture(scrollArea->viewport());
+        scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+
+        QScroller::grabGesture(scrollArea->viewport(), QScroller::LeftMouseButtonGesture);
+
+        scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
         QScroller::grabGesture(
             scrollArea->viewport(),
